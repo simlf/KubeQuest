@@ -1,9 +1,6 @@
-# Example terraform.tfvars file
-# Copy this to terraform.tfvars and fill in your values
-# Do NOT commit terraform.tfvars to version control
+hcp_project_id = "your-hcp-project-id"
 
-# For local development, you can set subscription_id here
-# subscription_id = "your-subscription-id"
-
-# Alternatively, set the environment variable:
-# export TF_VAR_subscription_id=your-subscription-id
+# Optional overrides
+# location = "your-preferred-region"
+# resource_group_name = "your-resource-group"
+# vm_size = "your-preferred-vm-size"

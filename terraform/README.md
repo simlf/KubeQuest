@@ -7,8 +7,9 @@ This repository contains Terraform configuration for deploying and managing Azur
 This project specifically sets up:
 - Virtual networks and subnets in Azure
 - Network interfaces and public IPs
-- Linux virtual machines with proper configurations
-- All necessary supporting resources
+- Multiple Linux virtual machines using a scalable approach
+- Integration with HCP Vault for secrets management
+- Remote state storage in Azure
 
 ## How Terraform Works
 
@@ -23,8 +24,22 @@ Terraform uses a declarative approach where you specify the desired end state of
 
 - [Terraform](https://www.terraform.io/downloads.html) 1.0+ installed
 - Azure CLI installed and configured (`az login`)
-- Azure subscription with appropriate permissions
-- Azure subscription ID
+- Access to company-managed resource group "rg-group-015"
+- Access to HCP Vault with necessary secrets configured
+
+## Architecture
+
+- **Virtual Network**: Single VNet with a dedicated subnet
+- **Virtual Machines**: Multiple Ubuntu VMs defined through a collection
+- **Authentication**: SSH keys stored in HCP Vault
+- **State Management**: Remote state in Azure Storage
+
+## Required Secrets in HCP Vault
+
+The following secrets must be configured in the "azure-credentials" app in HCP Vault:
+- `ssh_admin_public_key`: SSH public key for admin access
+- `ssh_ansible_public_key`: SSH public key for Ansible
+- `subscription_id`: Azure subscription ID
 
 ## Setup
 
@@ -35,15 +50,32 @@ Terraform uses a declarative approach where you specify the desired end state of
    cd <repository-directory>
    ```
 
-2. **Configure Environment Variables**:
+2. **Set required variables**:
 
-   Set your Azure subscription ID as an environment variable:
+   The `hcp_project_id` variable is required and can be set using one of these methods:
 
-   ```bash
-   export TF_VAR_subscription_id=your-azure-subscription-id
+   **Option 1:** Create a `terraform.tfvars` file (recommended for local development):
+
+   ```terraform
+   hcp_project_id = "your-hcp-project-id"
+
+   # Optional overrides for default variables if needed
+   # location = "westeurope"
+   # resource_group_name = "different-resource-group"
+   # vm_size = "Standard_D4s_v3"
    ```
 
-   This keeps sensitive information out of your codebase.
+   **Option 2:** Use environment variables:
+
+   ```bash
+   export TF_VAR_hcp_project_id="your-hcp-project-id"
+   ```
+
+   **Option 3:** Provide it directly on the command line:
+
+   ```bash
+   terraform plan -var="hcp_project_id=your-hcp-project-id"
+   ```
 
 3. **Initialize Terraform**:
 
@@ -113,32 +145,43 @@ You can retrieve your Azure subscription ID and other secrets from HashiCorp Vau
 
 You can also log into the HashiCorp Cloud Platform web interface to access and manage your secrets through a user-friendly dashboard.
 
-### Using the API
-
-For programmatic access, HCP Vault Secrets provides a REST API that can be integrated into scripts or automation workflows. Consult the HashiCorp developer documentation for details.
-
 ## Project Structure
 
 - `main.tf` - Contains the main resource definitions for Azure VMs and networking
 - `variables.tf` - Defines input variables used in the configuration
-- `backend.tf` - Configures Terraform state storage
-- `terraform.tfvars.example` - Example variable definitions (do not commit actual values)
+- `backend.tf` - Configures Terraform state storage in Azure
+- `terraform.tfvars` - Used to set required variables (not committed to version control)
+- `example.tfvars` - Example variable file with placeholder values (safe to commit)
+
+## Variables
+
+| Name | Description | Default |
+|------|-------------|---------|
+| location | Azure region to deploy resources | spaincentral |
+| resource_group_name | Name of the resource group | rg-group-015 |
+| vm_size | Size of the VMs | Standard_B2ls_v2 |
+| hcp_project_id | HCP project ID | (must be provided) |
+
+## Recent Improvements
+
+- Replaced hardcoded values with variables for better maintainability
+- Used for_each to manage multiple VMs with less code duplication
+- Added data source reference to company-managed resource group
+- Configured remote state in Azure Storage
+- Improved code organization and structure
 
 ## Security Best Practices
 
-- Never commit sensitive credentials or `terraform.tfvars` to version control
+- Never commit sensitive credentials to version control
+- Add `*.tfvars` to your `.gitignore` file (except for example files)
 - Use environment variables for secrets in CI/CD pipelines
-- Store state files securely when using remote backends
+- Store state files securely using the Azure backend
 - Review access permissions to your Azure resources regularly
-
-## Alternative Variable Management
-
-You can also use a local `terraform.tfvars` file for development:
 
 ## Troubleshooting
 
 If you encounter issues:
 - Ensure Azure CLI is properly authenticated
 - Verify your subscription has sufficient permissions
-- Check that environment variables are correctly set
+- Check that the HCP Vault secrets are correctly configured
 - Review Terraform logs for detailed error information
