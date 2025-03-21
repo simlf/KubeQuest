@@ -1,0 +1,6 @@
+hcp_project_id = "your-hcp-project-id"
+
+# Optional overrides
+# location = "your-preferred-region"
+# resource_group_name = "your-resource-group"
+# vm_size = "your-preferred-vm-size"
