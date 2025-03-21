@@ -1,0 +1,9 @@
+# Example terraform.tfvars file
+# Copy this to terraform.tfvars and fill in your values
+# Do NOT commit terraform.tfvars to version control
+
+# For local development, you can set subscription_id here
+# subscription_id = "your-subscription-id"
+
+# Alternatively, set the environment variable:
+# export TF_VAR_subscription_id=your-subscription-id
