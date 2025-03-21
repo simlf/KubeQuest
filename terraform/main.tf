@@ -37,25 +37,33 @@ data "azurerm_resource_group" "rg" {
 }
 
 # Virtual Network
-resource "azurerm_virtual_network" "vnet_internal_001" {
-  name                = "vnet-internal-001"
+resource "azurerm_virtual_network" "vnet_kubernetes" {
+  name                = "vnet-kubernetes"
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   address_space       = ["10.0.0.0/16"]
 }
 
-# Subnet for VM 1
-resource "azurerm_subnet" "internal" {
-  name                 = "snet-internal-001"
+# Subnet for master node
+resource "azurerm_subnet" "subnet_master" {
+  name                 = "snet-kubernetes-master"
   resource_group_name  = data.azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet_internal_001.name
+  virtual_network_name = azurerm_virtual_network.vnet_kubernetes.name
   address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Subnet for worker nodes
+resource "azurerm_subnet" "subnet_worker" {
+  name                 = "snet-kubernetes-worker"
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet_kubernetes.name
+  address_prefixes     = ["10.0.2.0/24"]
 }
 
 locals {
   vms = {
-    "001" = { name = "vm-kub-001", nic = "nic-vm-kub-001", public_ip = "ip-public-vm1-001" }
-    "002" = { name = "vm-kub-002", nic = "nic-vm-kub-002", public_ip = "ip-public-vm2-001" }
+    "master" = { name = "vm-kub-master", nic = "nic-vm-kub-master", public_ip = "ip-public-vm-master" }
+    "worker" = { name = "vm-kub-worker", nic = "nic-vm-kub-worker", public_ip = "ip-public-vm-worker" }
   }
 }
 
@@ -76,7 +84,7 @@ resource "azurerm_network_interface" "nic_vm_kub" {
 
   ip_configuration {
     name                          = "ipconfig"
-    subnet_id                     = azurerm_subnet.internal.id
+    subnet_id                     = each.key == "master" ? azurerm_subnet.subnet_master.id : azurerm_subnet.subnet_worker.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.ip_public_vm[each.key].id
   }
@@ -143,4 +151,166 @@ resource "azurerm_virtual_machine" "vm_kub" {
   tags = {
     environment = "production"
   }
+}
+
+# Network Security Groups for Kubernetes
+resource "azurerm_network_security_group" "nsg_kub_master" {
+  name                = "nsg-kub-master"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  # SSH access
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # Kubernetes API server
+  security_rule {
+    name                       = "Kubernetes-API-Server"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "6443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # etcd server client API
+  security_rule {
+    name                       = "Etcd-server"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "2379-2380"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # Kubelet API
+  security_rule {
+    name                       = "Kubelet-API"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10250"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # kube-scheduler
+  security_rule {
+    name                       = "Kube-Scheduler"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10259"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # kube-controller-manager
+  security_rule {
+    name                       = "Kube-Controller-Manager"
+    priority                   = 1005
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10257"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "production"
+  }
+}
+
+resource "azurerm_network_security_group" "nsg_kub_worker" {
+  name                = "nsg-kub-worker"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  # SSH access
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # Kubelet API
+  security_rule {
+    name                       = "Kubelet-API"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10250"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # kube-proxy
+  security_rule {
+    name                       = "Kube-Proxy"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10256"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # NodePort Services
+  security_rule {
+    name                       = "NodePort-Services"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "30000-32767"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "production"
+  }
+}
+
+# Associate NSGs with network interfaces
+resource "azurerm_network_interface_security_group_association" "master_nsg_association" {
+  network_interface_id      = azurerm_network_interface.nic_vm_kub["master"].id
+  network_security_group_id = azurerm_network_security_group.nsg_kub_master.id
+}
+
+resource "azurerm_network_interface_security_group_association" "worker_nsg_association" {
+  network_interface_id      = azurerm_network_interface.nic_vm_kub["worker"].id
+  network_security_group_id = azurerm_network_security_group.nsg_kub_worker.id
 }
