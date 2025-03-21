@@ -1,6 +1,35 @@
+terraform {
+  required_providers {
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.76.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
-  subscription_id = var.subscription_id
+  subscription_id = data.hcp_vault_secrets_secret.subscription_id.secret_value
+}
+
+provider "hcp" {
+  project_id = "5eaf5a23-28a1-4104-809c-8cf3beb801ee"
+}
+
+# Fetch SSH keys from HCP Vault Secrets
+data "hcp_vault_secrets_secret" "admin_key" {
+  app_name    = "azure-credentials"
+  secret_name = "ssh_admin_public_key"
+}
+
+data "hcp_vault_secrets_secret" "ansible_key" {
+  app_name    = "azure-credentials"
+  secret_name = "ssh_ansible_public_key"
+}
+
+data "hcp_vault_secrets_secret" "subscription_id" {
+  app_name    = "azure-credentials"
+  secret_name = "subscription_id"
 }
 
 # Virtual Network
@@ -81,11 +110,22 @@ resource "azurerm_virtual_machine" "vm_kub_001" {
   os_profile {
     computer_name  = "vm-kub-001"
     admin_username = "adminuser"
-    admin_password = "Password1234!"
   }
 
   os_profile_linux_config {
-    disable_password_authentication = false
+    disable_password_authentication = true
+
+    # Admin key
+    ssh_keys {
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = data.hcp_vault_secrets_secret.admin_key.secret_value
+    }
+
+    # Ansible key
+    ssh_keys {
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = data.hcp_vault_secrets_secret.ansible_key.secret_value
+    }
   }
 
   tags = {
@@ -156,11 +196,22 @@ resource "azurerm_virtual_machine" "vm_kub_002" {
   os_profile {
     computer_name  = "vm-kub-002"
     admin_username = "adminuser"
-    admin_password = "Password1234!"
   }
 
   os_profile_linux_config {
-    disable_password_authentication = false
+    disable_password_authentication = true
+
+    # Admin key
+    ssh_keys {
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = data.hcp_vault_secrets_secret.admin_key.secret_value
+    }
+
+    # Ansible key
+    ssh_keys {
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = data.hcp_vault_secrets_secret.ansible_key.secret_value
+    }
   }
 
   tags = {
