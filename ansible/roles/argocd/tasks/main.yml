@@ -1,0 +1,45 @@
+- name: Create ArgoCD Namespace
+  shell: |
+    kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+
+- name: Download ArgoCD manifest
+  get_url:
+    url: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+    dest: "/tmp/argocd-install.yaml"
+    mode: "0644"
+
+- name: Apply ArgoCD manifest
+  shell: |
+    kubectl apply -f /tmp/argocd-install.yaml -n argocd
+
+- name: Copy ingress
+  copy:
+    src: argocd-ingress.yml
+    dest: /tmp/argocd-ingress.yml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
+
+- name: Apply ArgoCD ingress
+  shell: |
+    kubectl apply -f /tmp/argocd-ingress.yml -n argocd
+
+- name: Copy example-app
+  copy:
+    src: example-app.yml
+    dest: /tmp/example-app.yml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
+
+- name: Apply ArgoCD example app
+  shell: |
+    kubectl apply -f /tmp/example-app.yml -n argocd
+
+- name: Save argocd admin password
+  shell: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+  register: argocd_admin_password
+
+- name: Output argocd admin password
+  debug:
+    msg: "{{ argocd_admin_password.stdout }}"

@@ -1,0 +1,53 @@
+- name: Base setup
+  hosts: all
+  roles:
+    - setup
+
+- name: Install docker
+  hosts: all
+  roles:
+    - docker
+
+- name: Install kubeadm
+  hosts: all
+  roles:
+    - kubeadm
+
+- name: Setup master
+  hosts: vm-kub-master
+  roles:
+    - master
+
+- name: Setup nodes
+  hosts: vm-kub-worker
+  roles:
+    - node
+- name: Wait for core pods to be up
+  hosts: vm-kub-master
+  roles:
+    - wait-core
+
+# - name: Setup metallb
+#   hosts: vm-kub-master
+#   roles:
+#     - network
+#   vars_files:
+#     - tf_ansible_vars.yml
+
+- name: Install helm
+  hosts: vm-kub-master
+  roles:
+    - helm
+# - name: Setup nginx
+#   hosts: vm-kub-master
+#   roles:
+#     - nginx
+# - name: Wait nginx controller
+#   hosts: vm-kub-master
+#   roles:
+#     - wait-nginx
+
+- name: Setup argocd
+  hosts: vm-kub-master
+  roles:
+    - argocd

@@ -1,0 +1,38 @@
+- name: Update the package cache
+  apt:
+    update_cache: yes
+
+- name: Explicity load br_netfilter module
+  command: modprobe br_netfilter
+
+- name: Create k8s.conf with sysctl settings
+  copy:
+    dest: /etc/sysctl.d/k8s.conf
+    content: |
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply sysctl settings
+  command: sysctl --system
+
+- name: Set the hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Update /etc/hostname file
+  copy:
+    dest: /etc/hostname
+    content: "{{ inventory_hostname }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Update /etc/hosts file
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ inventory_hostname }}"
+    backrefs: yes

@@ -1,0 +1,26 @@
+- name: Create namespace metalLB
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+
+- name: Create metalLB controller
+  shell: |
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+  ignore_errors: yes
+
+- name: Copy metallb config file
+  copy:
+    src: metallb-config-pool.yml
+    dest: /tmp/metallb-config-pool.yml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
+
+- name: Replace ip
+  replace:
+    path: /tmp/metallb-config-pool.yml
+    regexp: "IP_ADDRESS"
+    replace: "{{ kube_ansible_ip }}-{{ kube_ansible_ip }}"
+
+- name: Apply metallb config
+  shell: |
+    kubectl apply -f /tmp/metallb-config-pool.yml
