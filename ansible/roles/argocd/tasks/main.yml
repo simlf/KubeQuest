@@ -36,6 +36,9 @@
   shell: |
     kubectl apply -f /tmp/example-app.yml -n argocd
 
+- name: Wait for argocd-server to be ready
+  shell: kubectl wait pod --all --for=condition=Ready --namespace=argocd --timeout=600s
+
 - name: Save argocd admin password
   shell: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
   register: argocd_admin_password

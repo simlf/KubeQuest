@@ -27,21 +27,16 @@
   roles:
     - wait-core
 
-# - name: Setup metallb
-#   hosts: vm-kub-master
-#   roles:
-#     - network
-#   vars_files:
-#     - tf_ansible_vars.yml
-
 - name: Install helm
   hosts: vm-kub-master
   roles:
     - helm
-# - name: Setup nginx
-#   hosts: vm-kub-master
-#   roles:
-#     - nginx
+
+- name: Setup nginx
+  hosts: vm-kub-master
+  roles:
+    - nginx
+
 # - name: Wait nginx controller
 #   hosts: vm-kub-master
 #   roles:

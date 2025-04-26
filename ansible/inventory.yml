@@ -3,12 +3,12 @@ all:
     vm-kub-master:
       hosts:
         k8s-server:
-          ansible_host: 158.158.40.174
+          ansible_host: 158.158.32.63
           ansible_become: true
           ansible_user: adminuser
     vm-kub-worker:
       hosts:
         k8s-node-0:
-          ansible_host: 158.158.33.104
+          ansible_host: 68.221.198.100
           ansible_become: true
           ansible_user: adminuser

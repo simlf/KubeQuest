@@ -159,83 +159,107 @@ resource "azurerm_network_security_group" "nsg_kub_master" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
+  security_rule {
+    name                       = "test"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "test1"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   # SSH access
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1000
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name                       = "SSH"
+  #   priority                   = 1000
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "22"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # Kubernetes API server
-  security_rule {
-    name                       = "Kubernetes-API-Server"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "6443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # Kubernetes API server
+  # security_rule {
+  #   name                       = "Kubernetes-API-Server"
+  #   priority                   = 1001
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "6443"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # etcd server client API
-  security_rule {
-    name                       = "Etcd-server"
-    priority                   = 1002
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "2379-2380"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # etcd server client API
+  # security_rule {
+  #   name                       = "Etcd-server"
+  #   priority                   = 1002
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "2379-2380"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # Kubelet API
-  security_rule {
-    name                       = "Kubelet-API"
-    priority                   = 1003
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10250"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # Kubelet API
+  # security_rule {
+  #   name                       = "Kubelet-API"
+  #   priority                   = 1003
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "10250"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # kube-scheduler
-  security_rule {
-    name                       = "Kube-Scheduler"
-    priority                   = 1004
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10259"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # kube-scheduler
+  # security_rule {
+  #   name                       = "Kube-Scheduler"
+  #   priority                   = 1004
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "10259"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # kube-controller-manager
-  security_rule {
-    name                       = "Kube-Controller-Manager"
-    priority                   = 1005
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10257"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # kube-controller-manager
+  # security_rule {
+  #   name                       = "Kube-Controller-Manager"
+  #   priority                   = 1005
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "10257"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
   tags = {
     environment = "production"
@@ -247,57 +271,81 @@ resource "azurerm_network_security_group" "nsg_kub_worker" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
+  security_rule {
+    name                       = "test"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "test1"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   # SSH access
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1000
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name                       = "SSH"
+  #   priority                   = 1000
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "22"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # Kubelet API
-  security_rule {
-    name                       = "Kubelet-API"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10250"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # Kubelet API
+  # security_rule {
+  #   name                       = "Kubelet-API"
+  #   priority                   = 1001
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "10250"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # kube-proxy
-  security_rule {
-    name                       = "Kube-Proxy"
-    priority                   = 1002
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10256"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # kube-proxy
+  # security_rule {
+  #   name                       = "Kube-Proxy"
+  #   priority                   = 1002
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "10256"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  # NodePort Services
-  security_rule {
-    name                       = "NodePort-Services"
-    priority                   = 1003
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "30000-32767"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # # NodePort Services
+  # security_rule {
+  #   name                       = "NodePort-Services"
+  #   priority                   = 1003
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "30000-32767"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
   tags = {
     environment = "production"
@@ -313,4 +361,24 @@ resource "azurerm_network_interface_security_group_association" "master_nsg_asso
 resource "azurerm_network_interface_security_group_association" "worker_nsg_association" {
   network_interface_id      = azurerm_network_interface.nic_vm_kub["worker"].id
   network_security_group_id = azurerm_network_security_group.nsg_kub_worker.id
+}
+
+resource "local_file" "ansible_inventory" {
+  filename = "../ansible/inventory.yml"
+  content  = <<-EOF
+  all:
+    children:
+      vm-kub-master:
+        hosts:
+          k8s-server:
+            ansible_host: ${azurerm_public_ip.ip_public_vm["master"].ip_address}
+            ansible_become: true
+            ansible_user: adminuser
+      vm-kub-worker:
+        hosts:
+          k8s-node-0:
+            ansible_host: ${azurerm_public_ip.ip_public_vm["worker"].ip_address}
+            ansible_become: true
+            ansible_user: adminuser
+  EOF
 }
