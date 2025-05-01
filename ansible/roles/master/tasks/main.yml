@@ -23,7 +23,19 @@
     owner: "{{ ansible_env.USER }}"
     group: "{{ ansible_env.USER }}"
 
+- name: Install calico operator
+  shell: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/tigera-operator.yaml
+
+- name: Get calico
+  shell: curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/custom-resources.yaml -O
+
+- name: Replace CIDR in Calico installation file
+  ansible.builtin.replace:
+    path: custom-resources.yaml
+    regexp: 'cidr:\s*192\.168\.0\.0/16'
+    replace: "cidr: 10.96.0.0/16"
+
 - name: Install Calico
-  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.3/manifests/calico.yaml
+  shell: kubectl create -f custom-resources.yaml
 # - name: Allow pods to be deployed on master
 #   shell: kubectl taint nodes --all node-role.kubernetes.io/master-
