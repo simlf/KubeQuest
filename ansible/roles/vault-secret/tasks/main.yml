@@ -1,0 +1,50 @@
+- name: Add the HashiCorp Helm repository
+  shell: helm repo add hashicorp https://helm.releases.hashicorp.com
+
+- name: Install the Vault Secrets Operator
+  shell: |
+    helm install vault-secrets-operator hashicorp/vault-secrets-operator \
+     --namespace vault-secrets-operator-system \
+     --create-namespace
+
+- name: Create a Kubernetes secret for the HCP service principal credentials
+  shell: |
+    kubectl create secret generic vso-demo-sp \
+    --namespace default \
+    --from-literal=clientID={{ parsed_env.VAULT_CLIENT_ID }} \
+    --from-literal=clientSecret={{ parsed_env.VAULT_CLIENT_SECRET }} \
+
+- name: Configure Vault Secrets Operator with the HCP organization and project ID.
+  shell: |
+    kubectl create -f - <<EOF
+    ---
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: HCPAuth
+    metadata:
+      name: default
+      namespace: vault-secrets-operator-system
+    spec:
+      organizationID: {{ parsed_env.VAULT_ORG_ID }}
+      projectID: {{ parsed_env.VAULT_PROJECT_ID }}
+      servicePrincipal:
+        secretRef: vso-demo-sp
+    EOF
+
+- name: Create a Kubernetes secret for the HCP service principal credentials
+  shell: |
+    kubectl create -f - <<EOF
+    ---
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: HCPVaultSecretsApp
+    metadata:
+      name: azure-credentials
+      namespace: default
+    spec:
+      appName: azure-credentials
+      destination:
+        create: true
+        labels:
+          hvs: "true"
+        name: azure-credentials
+      refreshAfter: 1h
+    EOF

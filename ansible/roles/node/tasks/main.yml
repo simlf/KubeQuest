@@ -1,0 +1,2 @@
+- name: Join kubeadm cluster
+  shell: sudo {{ hostvars['k8s-server']['cluster_join_command'] }} --cri-socket unix:///var/run/cri-dockerd.sock

@@ -159,6 +159,30 @@ resource "azurerm_network_security_group" "nsg_kub_master" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
+  # security_rule {
+  #   name                       = "test"
+  #   priority                   = 101
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "*"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
+
+  # security_rule {
+  #   name                       = "test1"
+  #   priority                   = 101
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "*"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
+
   # SSH access
   security_rule {
     name                       = "SSH"
@@ -247,6 +271,30 @@ resource "azurerm_network_security_group" "nsg_kub_worker" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
+  # security_rule {
+  #   name                       = "test"
+  #   priority                   = 101
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "*"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
+
+  # security_rule {
+  #   name                       = "test1"
+  #   priority                   = 101
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "*"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
+
   # SSH access
   security_rule {
     name                       = "SSH"
@@ -299,6 +347,18 @@ resource "azurerm_network_security_group" "nsg_kub_worker" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "NGINX"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   tags = {
     environment = "production"
   }
@@ -313,4 +373,24 @@ resource "azurerm_network_interface_security_group_association" "master_nsg_asso
 resource "azurerm_network_interface_security_group_association" "worker_nsg_association" {
   network_interface_id      = azurerm_network_interface.nic_vm_kub["worker"].id
   network_security_group_id = azurerm_network_security_group.nsg_kub_worker.id
+}
+
+resource "local_file" "ansible_inventory" {
+  filename = "../ansible/inventory.yml"
+  content  = <<-EOF
+  all:
+    children:
+      vm-kub-master:
+        hosts:
+          k8s-server:
+            ansible_host: ${azurerm_public_ip.ip_public_vm["master"].ip_address}
+            ansible_become: true
+            ansible_user: adminuser
+      vm-kub-worker:
+        hosts:
+          k8s-node-0:
+            ansible_host: ${azurerm_public_ip.ip_public_vm["worker"].ip_address}
+            ansible_become: true
+            ansible_user: adminuser
+  EOF
 }
