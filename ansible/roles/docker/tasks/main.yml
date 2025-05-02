@@ -1,0 +1,71 @@
+- name: Check if Docker is installed
+  command: docker -v
+  register: docker_installed
+  ignore_errors: true
+
+- name: Install Docker
+  block:
+    - name: Add Docker's official GPG key
+      block:
+        - name: Install necessary packages
+          ansible.builtin.apt:
+            name:
+              - ca-certificates
+              - curl
+              - gnupg
+            state: latest
+            update_cache: yes
+        - name: Add GPG key
+          ansible.builtin.shell:
+            cmd: |
+              sudo install -m 0755 -d /etc/apt/keyrings
+              sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+              sudo chmod a+r /etc/apt/keyrings/docker.asc
+    - name: Add the repository to Apt sources
+      block:
+        - name: Add repos
+          ansible.builtin.shell:
+            cmd: |
+              echo \
+              "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+              $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - name: Install Docker packages
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: latest
+        update_cache: yes
+  when: docker_installed.failed
+# - name: Ensure Docker group exists
+#   ansible.builtin.group:
+#     name: docker
+#     state: present
+#   register: docker_group
+
+# - name: Add User to docker group
+#   ansible.builtin.user:
+#     name: k8s
+#     groups: docker
+#     append: true
+#   when: docker_group is changed
+
+# This is needed because docker is not CRI compatible anymore
+- name: Download cri-dockerd package
+  get_url:
+    url: "https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.16/cri-dockerd_0.3.16.3-0.ubuntu-jammy_amd64.deb"
+    dest: "/tmp/cri-dockerd.deb"
+    mode: "0644"
+
+- name: Install cri-dockerd package
+  apt:
+    deb: "/tmp/cri-dockerd.deb"
+
+- name: Clean up cri-dockerd package
+  file:
+    path: "/tmp/cri-dockerd.deb"
+    state: absent

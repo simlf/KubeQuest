@@ -1,0 +1,13 @@
+- name: Download Helm installation script
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: "0644" # Initially readable by all users
+
+- name: Set execute permissions for the script
+  file:
+    path: /tmp/get_helm.sh
+    mode: "0700" # Owner can read, write, and execute
+
+- name: Run the Helm installation script
+  command: /tmp/get_helm.sh
