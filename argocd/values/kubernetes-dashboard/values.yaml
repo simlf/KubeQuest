@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 resources:
   limits:
@@ -19,11 +19,25 @@ metricsScraper:
       memory: 64Mi
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 443
+  targetPort: 8443
+  nodePort: 30507
 
 ingress:
-  enabled: false
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  hosts:
+    - dashboard.example.com
+  path: /
+  pathType: Prefix
+  tls:
+    - secretName: kubernetes-dashboard-tls
+      hosts:
+        - dashboard.example.com
 
 securityContext:
   runAsUser: 1001
