@@ -82,3 +82,15 @@
 - name: Output argocd admin password
   debug:
     msg: "{{ argocd_admin_password.stdout }}"
+
+- name: Copy mysql-app
+  copy:
+    src: mysql-app.yml
+    dest: /tmp/mysql-app.yml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply MySQL app
+  shell: |
+    kubectl apply -f /tmp/mysql-app.yml -n argocd
