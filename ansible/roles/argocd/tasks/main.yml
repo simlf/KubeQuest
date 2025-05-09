@@ -45,18 +45,6 @@
   shell: |
     kubectl apply -f /tmp/example-app.yml -n argocd
 
-- name: Copy postgres-app
-  copy:
-    src: postgres-app.yml
-    dest: /tmp/postgres-app.yml
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Apply PostgreSQL database
-  shell: |
-    kubectl apply -f /tmp/postgres-app.yml -n argocd
-
 - name: Copy mysql-storage
   copy:
     src: mysql-storage.yml
