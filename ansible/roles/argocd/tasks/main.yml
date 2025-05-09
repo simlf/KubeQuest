@@ -36,6 +36,42 @@
   shell: |
     kubectl apply -f /tmp/example-app.yml -n argocd
 
+- name: Copy postgres-app
+  copy:
+    src: postgres-app.yml
+    dest: /tmp/postgres-app.yml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply PostgreSQL database
+  shell: |
+    kubectl apply -f /tmp/postgres-app.yml -n argocd
+
+- name: Copy mysql-storage
+  copy:
+    src: mysql-storage.yml
+    dest: /tmp/mysql-storage.yml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply MySQL storage
+  shell: |
+    kubectl apply -f /tmp/mysql-storage.yml
+
+- name: Copy mysql-pvc
+  copy:
+    src: mysql-pvc.yml
+    dest: /tmp/mysql-pvc.yml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply MySQL PVC
+  shell: |
+    kubectl apply -f /tmp/mysql-pvc.yml
+
 - name: Wait for argocd-server to be ready
   shell: kubectl wait pod --all --for=condition=Ready --namespace=argocd --timeout=600s
 
