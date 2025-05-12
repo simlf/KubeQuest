@@ -10,4 +10,4 @@ spec:
     requests:
       storage: 8Gi
   storageClassName: local-storage
-  volumeName: mysql-pv  # Référence directe à notre PV existant 
+  volumeName: mysql-pv  # Direct reference to our existing PV 

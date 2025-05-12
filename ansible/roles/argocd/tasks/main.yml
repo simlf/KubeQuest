@@ -1,4 +1,4 @@
-- name: Préparer le dossier /mnt/data sur le nœud MySQL
+- name: Prepare the /mnt/data folder on the MySQL node
   become: true
   ansible.builtin.file:
     path: /mnt/data

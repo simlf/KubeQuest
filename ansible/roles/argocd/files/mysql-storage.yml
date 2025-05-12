@@ -25,4 +25,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - k8s-server  # Modifiez cette valeur pour correspondre au nom de votre nœud 
+          - k8s-server  # Change this value to match the name our node  
