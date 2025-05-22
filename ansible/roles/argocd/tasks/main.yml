@@ -1,11 +1,3 @@
-- name: Prepare the /mnt/data folder on the MySQL node
-  become: true
-  ansible.builtin.file:
-    path: /mnt/data
-    state: directory
-    owner: 1001
-    group: 1001
-    mode: '0755'
 
 - name: Create ArgoCD Namespace
   shell: |
@@ -44,6 +36,16 @@
 - name: Apply ArgoCD example app
   shell: |
     kubectl apply -f /tmp/example-app.yml -n argocd
+
+- name: Prepare the /mnt/data folder on the MySQL node
+  become: true
+  ansible.builtin.file:
+    path: /mnt/data
+    state: directory
+    owner: 1001
+    group: 1001
+    mode: '0755'
+  register: mkdir_result
 
 - name: Copy mysql-storage
   copy:
