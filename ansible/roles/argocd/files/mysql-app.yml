@@ -38,7 +38,7 @@ spec:
             failureThreshold: 18
   destination:
     server: https://kubernetes.default.svc
-    namespace: database
+    namespace: default
   syncPolicy:
     automated:
       prune: true
