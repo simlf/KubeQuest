@@ -1,0 +1,10 @@
+apiVersion: v2
+name: monitoring
+description: A Helm chart for deploying Grafana
+type: application
+version: 0.1.0
+appVersion: "10.0.0"
+dependencies:
+  - name: grafana
+    version: 7.0.12
+    repository: https://grafana.github.io/helm-charts

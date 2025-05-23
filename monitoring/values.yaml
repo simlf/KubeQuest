@@ -1,0 +1,17 @@
+adminUser: admin
+adminPassword: admin
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: grafana.local
+      paths:
+        - "/"
+  tls: []
+
+persistence:
+  enabled: false
