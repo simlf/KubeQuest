@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: cley44/kubequest
+  tag: "1.2"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+envSecretName: app-env-secret
+#TEMPORARY
+secret:
+  enabled: true
+  name: app-env-secret
+  data:
+    DB_HOST: mysql.default.svc.cluster.local
+    DB_NAME: kubequest
+    DB_USER: root
+    DB_PASSWORD: kubequest
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix

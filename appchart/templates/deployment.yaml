@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "appchart.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "appchart.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "appchart.name" . }}
+    spec:
+      containers:
+        - name: php
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: {{ .Values.envSecretName }}
