@@ -10,15 +10,12 @@ service:
   port: 80
 
 envSecretName: app-env-secret
-#TEMPORARY
+
 secret:
   enabled: true
   name: app-env-secret
   data:
-    DB_HOST: mysql.default.svc.cluster.local
-    DB_NAME: kubequest
-    DB_USER: root
-    DB_PASSWORD: kubequest
+    APP_KEY: qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 ingress:
   enabled: true
