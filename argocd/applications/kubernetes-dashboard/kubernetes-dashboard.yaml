@@ -9,80 +9,15 @@ metadata:
     app.kubernetes.io/part-of: kubernetes-dashboard
   annotations:
     argocd.argoproj.io/description: "Kubernetes Dashboard - Web-based UI for Kubernetes clusters"
-    argocd.argoproj.io/compare-options: "IgnoreExtraneous"
-    argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     chart: kubernetes-dashboard
     repoURL: https://kubernetes.github.io/dashboard/
-    targetRevision: 6.0.8
+    targetRevision: 7.0.0
     helm:
-      values: |
-        replicaCount: 1
-
-        resources:
-          limits:
-            cpu: 200m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-
-        metricsScraper:
-          enabled: true
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 50m
-              memory: 64Mi
-
-        service:
-          type: ClusterIP
-          port: 443
-          targetPort: 8443
-
-        ingress:
-          enabled: true
-          className: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-            nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-            kubernetes.io/ingress.class: nginx
-          hosts:
-            - dashboard.example.com
-          path: /
-          pathType: Prefix
-
-        securityContext:
-          runAsUser: 1001
-          runAsGroup: 1001
-          fsGroup: 1001
-
-        extraArgs:
-          - --enable-skip-login
-          - --enable-insecure-login
-          - --token-ttl=43200
-
-        # Health check settings
-        livenessProbe:
-          httpGet:
-            scheme: HTTPS
-            path: /
-            port: 8443
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-
-        readinessProbe:
-          httpGet:
-            scheme: HTTPS
-            path: /
-            port: 8443
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
@@ -92,5 +27,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - SkipDryRunOnMissingResource=true
-      - Validate=false

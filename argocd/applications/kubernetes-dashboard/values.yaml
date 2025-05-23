@@ -1,0 +1,90 @@
+# Disable the old ingress configuration
+ingress:
+  enabled: false
+
+# Kong gateway configuration
+kong:
+  enabled: true
+  service:
+    type: NodePort
+    port: 443
+    targetPort: 8443
+    nodePort: 30507
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: dashboard.example.com
+  plugins:
+    - name: ssl
+      config:
+        protocols:
+          - https
+        redirect_status_code: 301
+        force_ssl_redirect: true
+        ssl_passthrough: true
+
+# RBAC Configuration
+rbac:
+  create: true
+  clusterRoleMetrics: true
+  clusterRole: true
+  clusterRoleBinding: true
+  serviceAccount:
+    create: true
+    name: kubernetes-dashboard
+    annotations: {}
+
+# Create admin user service account
+extraServiceAccounts:
+  - name: admin-user
+    namespace: kubernetes-dashboard
+    clusterRole: cluster-admin
+    annotations:
+      kubernetes.io/service-account.name: admin-user
+
+# Network Policy Configuration
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kubernetes-dashboard
+      ports:
+        - protocol: TCP
+          port: 8443
+
+# Health check settings
+livenessProbe:
+  httpGet:
+    scheme: HTTPS
+    path: /
+    port: 8443
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+
+readinessProbe:
+  httpGet:
+    scheme: HTTPS
+    path: /
+    port: 8443
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+
+# Kong Ingress Configuration
+kongIngress:
+  enabled: true
+  annotations:
+    konghq.com/protocols: https
+    konghq.com/https-redirect-status-code: "301"
+    konghq.com/force-ssl-redirect: "true"
+    konghq.com/ssl-passthrough: "true"
+  ingressClassName: kong
+  hosts:
+    - host: dashboard.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 443

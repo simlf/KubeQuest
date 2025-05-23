@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+  annotations:
+    konghq.com/protocols: https
+    konghq.com/https-redirect-status-code: "301"
+    konghq.com/force-ssl-redirect: "true"
+    konghq.com/ssl-passthrough: "true"
+    konghq.com/plugins: "ssl"
+    konghq.com/override: "ssl"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: dashboard.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard-web
+            port:
+              number: 8000
