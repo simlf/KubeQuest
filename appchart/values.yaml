@@ -15,10 +15,12 @@ secret:
   enabled: true
   name: app-env-secret
   data:
-    DB_HOST: mysql.default.svc.cluster.local
-    DB_NAME: kubequest
-    DB_USER: root
+    DB_HOST: mysql-db.default.svc.cluster.local
+    DB_DATABASE: kubequest
+    DB_USERNAME: root
     DB_PASSWORD: kubequest
+    APP_KEY: qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+    APP_DEBUG: "true"
 
 ingress:
   enabled: true
