@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: kubernetes-dashboard-kong-nodeport
   namespace: kubernetes-dashboard
+  labels:
+    app.kubernetes.io/name: kubernetes-dashboard
+    app.kubernetes.io/component: kong
 spec:
   type: NodePort
   ports:
   - port: 443
-    targetPort: 443
+    targetPort: 8445
     nodePort: 30507
     protocol: TCP
     name: https
