@@ -12,7 +12,7 @@ spec:
     helm:
       values: |
         auth:
-          rootPassword: kubequest
+          existingSecret: secret-mysql
           database: kubequest
         architecture: standalone
         primary:
