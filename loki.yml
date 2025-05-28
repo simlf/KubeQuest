@@ -1,0 +1,10 @@
+loki:
+  enabled: true
+
+promtail:
+  enabled: true
+
+grafana:
+  enabled: true
+  service:
+    type: NodePort
