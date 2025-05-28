@@ -27,15 +27,15 @@
 
 - name: Copy example-app
   copy:
-    src: example-app.yml
-    dest: /tmp/example-app.yml
+    src: app.yml
+    dest: /tmp/app.yml
     owner: root # Change owner if needed
     group: root # Change group if needed
     mode: "0644" # File permissions
 
 - name: Apply ArgoCD example app
   shell: |
-    kubectl apply -f /tmp/example-app.yml -n argocd
+    kubectl apply -f /tmp/app.yml -n argocd
 
 - name: Prepare the /mnt/data folder on the MySQL node
   become: true

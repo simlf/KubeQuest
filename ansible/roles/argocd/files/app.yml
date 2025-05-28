@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/simlf/KubeQuest.git
+    targetRevision: feat-app-chart
+    path: appchart
+  destination:
+    name: in-cluster
+    namespace: app
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
