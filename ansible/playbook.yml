@@ -51,6 +51,12 @@
   hosts: vm-kub-master
   roles:
     - argocd
+
+- name: Setup sealed-secrets
+  hosts: vm-kub-master
+  roles:
+    - sealed-secrets
+
 - name: Setup vault
   hosts: vm-kub-master
   roles:
