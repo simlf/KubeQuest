@@ -18,6 +18,8 @@ secret:
     DB_HOST: mysql-db.default.svc.cluster.local
     DB_DATABASE: kubequest
     APP_KEY: qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+    APP_DEBUG: "true"
+    APP_ENV: local
 
 ingress:
   enabled: true
