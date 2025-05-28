@@ -9,12 +9,14 @@ service:
   type: ClusterIP
   port: 80
 
-envSecretName: app-env-secret
+envSecretName: secret-mysql
 
 secret:
   enabled: true
   name: app-env-secret
   data:
+    DB_HOST: mysql-db.default.svc.cluster.local
+    DB_DATABASE: kubequest
     APP_KEY: qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 
 ingress:
