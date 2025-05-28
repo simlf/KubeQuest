@@ -11,71 +11,16 @@ metadata:
     app.kubernetes.io/part-of: kubernetes-dashboard
 spec:
   project: default
-  source:
-    repoURL: https://kubernetes.github.io/dashboard/
-    chart: kubernetes-dashboard
-    targetRevision: 7.11.0
-    helm:
-      values: |
-        # Enable metrics scraper
-        metricsScraper:
-          enabled: true
-
-        # Dashboard configuration
-        app:
-          ingress:
-            enabled: false
-
-        # Kong configuration for the proxy with NodePort
-        kong:
-          proxy:
-            type: NodePort
-            http:
-              nodePort: 30080
-            tls:
-              nodePort: 30507
-
-        # RBAC Configuration
-        rbac:
-          create: true
-          clusterReadOnlyRole: true
-
-        # Service Account
-        serviceAccount:
-          create: true
-          name: kubernetes-dashboard
-
-        # Extra resources to create admin user only
-        extraManifests:
-          - |
-            apiVersion: v1
-            kind: ServiceAccount
-            metadata:
-              name: admin-user
-              namespace: kubernetes-dashboard
-          - |
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: ClusterRoleBinding
-            metadata:
-              name: admin-user
-            roleRef:
-              apiGroup: rbac.authorization.k8s.io
-              kind: ClusterRole
-              name: cluster-admin
-            subjects:
-            - kind: ServiceAccount
-              name: admin-user
-              namespace: kubernetes-dashboard
-
-        # Security settings
-        protocolHttp: false
-        settings:
-          clusterName: "KubeQuest Cluster"
-          itemsPerPage: 20
-          labelsLimit: 3
-          logsAutoRefreshTimeInterval: 5
-          resourceAutoRefreshTimeInterval: 5
-          disableAccessDeniedNotifications: false
+  sources:
+    - repoURL: https://kubernetes.github.io/dashboard/
+      chart: kubernetes-dashboard
+      targetRevision: 6.0.8
+      helm:
+        valueFiles:
+          - $values/argocd/values/kubernetes-dashboard/values.yaml
+    - repoURL: https://github.com/simlf/KubeQuest.git
+      targetRevision: feat/kubernetes-dashboard-new
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
