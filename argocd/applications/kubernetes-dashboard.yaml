@@ -26,10 +26,11 @@ spec:
           ingress:
             enabled: false
 
-        # Service configuration to expose via NodePort
-        service:
-          type: NodePort
-          nodePort: 30507
+        # Kong configuration for the proxy
+        kong:
+          proxy:
+            type: NodePort
+            nodePort: 30507
 
         # RBAC Configuration
         rbac:
@@ -41,7 +42,7 @@ spec:
           create: true
           name: kubernetes-dashboard
 
-        # Extra resources to create admin user
+        # Extra resources to create admin user and NodePort service
         extraManifests:
           - |
             apiVersion: v1
@@ -62,6 +63,26 @@ spec:
             - kind: ServiceAccount
               name: admin-user
               namespace: kubernetes-dashboard
+          - |
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: kubernetes-dashboard-nodeport
+              namespace: kubernetes-dashboard
+              labels:
+                app.kubernetes.io/name: kubernetes-dashboard-nodeport
+            spec:
+              type: NodePort
+              ports:
+                - port: 443
+                  targetPort: 8443
+                  nodePort: 30507
+                  protocol: TCP
+                  name: https
+              selector:
+                app.kubernetes.io/component: app
+                app.kubernetes.io/instance: kubernetes-dashboard
+                app.kubernetes.io/name: kong
 
         # Security settings
         protocolHttp: false
