@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: laravel-migrations
+  namespace: app
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: migration
+          image: cley44/kubequest:1.2
+          command: ["php", "artisan", "migrate"]
+          envFrom:
+            - secretRef:
+                name: secret-mysql
+            - secretRef:
+                name: app-env-secret
+      restartPolicy: Never
+  backoffLimit: 1
