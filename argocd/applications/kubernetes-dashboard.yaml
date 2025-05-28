@@ -11,16 +11,101 @@ metadata:
     app.kubernetes.io/part-of: kubernetes-dashboard
 spec:
   project: default
-  sources:
-    - repoURL: https://kubernetes.github.io/dashboard/
-      chart: kubernetes-dashboard
-      targetRevision: 6.0.8
-      helm:
-        valueFiles:
-          - $values/argocd/values/kubernetes-dashboard/values.yaml
-    - repoURL: https://github.com/simlf/KubeQuest.git
-      targetRevision: feat/kubernetes-dashboard-new
-      ref: values
+  source:
+    repoURL: https://kubernetes.github.io/dashboard/
+    chart: kubernetes-dashboard
+    targetRevision: 6.0.8
+    helm:
+      values: |
+        replicaCount: 1
+
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+
+        metricsScraper:
+          enabled: true
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+
+        service:
+          type: NodePort
+          port: 443
+          targetPort: 8443
+          nodePort: 30507
+
+        ingress:
+          enabled: true
+          annotations:
+            nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+            nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+            nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+          hosts:
+            - dashboard.example.com
+          path: /
+          pathType: Prefix
+          tls:
+            - secretName: kubernetes-dashboard-tls
+              hosts:
+                - dashboard.example.com
+
+        securityContext:
+          runAsUser: 1001
+          runAsGroup: 1001
+          fsGroup: 1001
+
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
+        networkPolicy:
+          enabled: true
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: kubernetes-dashboard
+
+        # Extra resources for admin user
+        extraManifests:
+          - |
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: admin-user
+              namespace: kubernetes-dashboard
+          - |
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: admin-user
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: cluster-admin
+            subjects:
+            - kind: ServiceAccount
+              name: admin-user
+              namespace: kubernetes-dashboard
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
