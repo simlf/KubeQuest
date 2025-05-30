@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kubernetes-dashboard-gitops
+  name: kubernetes-dashboard
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/simlf/KubeQuest.git
-    targetRevision: feat/add-kubernetes-dashboard
+    targetRevision: HEAD
     path: ansible/roles/argocd/files/kubernetes-dashboard
   destination:
     server: https://kubernetes.default.svc
