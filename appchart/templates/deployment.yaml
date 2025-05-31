@@ -23,3 +23,17 @@ spec:
                 name: {{ .Values.envSecretName }}
             - secretRef:
                 name: {{ .Values.secret.name }}
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 3
