@@ -12,7 +12,7 @@ spec:
     targetRevision: feat-app-chart
     path: kubernetes-dashboard
   destination:
-    server: in-cluster
+    name: in-cluster
     namespace: kubernetes-dashboard
   syncPolicy:
     syncOptions:
