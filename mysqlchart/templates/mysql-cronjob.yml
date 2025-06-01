@@ -5,6 +5,8 @@ metadata:
   namespace: default
 spec:
   schedule: "*/2 * * * *" # Every five minutes
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
