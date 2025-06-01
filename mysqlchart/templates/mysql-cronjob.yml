@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
             - name: backup
-              image: bitnami/mysql:9.3
+              image: alpine:latest
               env:
                 - name: MYSQL_HOST
                   value: "mysql-db.default.svc.cluster.local"
@@ -31,6 +31,7 @@ spec:
               command: ["/bin/sh", "-c"]
               args:
                 - |
+                  apk add --no-cache mysql-client openssh
                   TIMESTAMP=$(date +%F_%H-%M)
                   BACKUP_FILE="/backup/db_backup_$TIMESTAMP.sql"
                   mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases > $BACKUP_FILE
