@@ -6,8 +6,13 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    cert-manager.io/cluster-issuer: cert-manager-webhook-duckdns-production
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - argocd-kubequest.duckdns.org
+      secretName: argocd-ingress-http
   rules:
     - http:
         paths:
@@ -18,4 +23,4 @@ spec:
                 name: argocd-server
                 port:
                   number: 443
-      host: argocd.example.com
+      host: argocd-kubequest.duckdns.org

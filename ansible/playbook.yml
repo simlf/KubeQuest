@@ -1,3 +1,15 @@
+- name: "Load .env file"
+  hosts: "all"
+  tasks:
+    - name: Load .env into list of lines
+      set_fact:
+        env_vars: "{{ lookup('file', '.env').splitlines() }}"
+    - name: Convert lines to dict
+      set_fact:
+        parsed_env: "{{ parsed_env | default({}) | combine({ item.split('=')[0]: item.split('=')[1] }) }}"
+      loop: "{{ env_vars }}"
+      when: item and '=' in item
+
 - name: Base setup
   hosts: all
   roles:
@@ -35,6 +47,11 @@
   hosts: vm-kub-master
   roles:
     - nginx
+
+- name: Setup cert-manager
+  hosts: vm-kub-master
+  roles:
+    - cert-manager
 
 - name: Setup sealed-secrets
   hosts: vm-kub-master
