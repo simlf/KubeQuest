@@ -25,7 +25,11 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: app.example.com
+    - host: kubequest.duckdns.org
       paths:
         - path: /
           pathType: Prefix
+  tls:
+    - secretName: app-tls
+      hosts:
+        - kubequest.duckdns.org

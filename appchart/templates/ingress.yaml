@@ -3,6 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "appchart.fullname" . }}
+  cert-manager.io/cluster-issuer: cert-manager-webhook-duckdns-production
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
