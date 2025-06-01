@@ -40,7 +40,7 @@ spec:
                   apk add --no-cache mysql-client openssh
                   TIMESTAMP=$(date +%F_%H-%M)
                   BACKUP_FILE="/backup/db_backup_$TIMESTAMP.sql"
-                  mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases > $BACKUP_FILE
+                  mysqldump --ssl-mode=DISABLED -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases > $BACKUP_FILE
 
                   ssh -o StrictHostKeyChecking=no adminuser@158.158.32.28 "mkdir -p /home/adminuser/backups/"
                   scp -o StrictHostKeyChecking=no $BACKUP_FILE adminuser@158.158.32.28:/home/adminuser/backups/
