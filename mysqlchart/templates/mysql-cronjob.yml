@@ -4,7 +4,7 @@ metadata:
   name: mysql-backup
   namespace: default
 spec:
-  schedule: "*/2 * * * *" # Every five minutes
+  schedule: "*/5 * * * *" # Every five minutes
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
@@ -44,6 +44,11 @@ spec:
 
                   ssh -o StrictHostKeyChecking=no adminuser@158.158.32.28 "mkdir -p /home/adminuser/backups/"
                   scp -o StrictHostKeyChecking=no $BACKUP_FILE adminuser@158.158.32.28:/home/adminuser/backups/
+
+                  # Delete backups older than 15 minutes
+                  ssh -o StrictHostKeyChecking=no adminuser@158.158.32.28 "find /home/adminuser/backups -type f -name "*.sql" -mmin +15 -delete"
+
+                  echo "Backup completed and transferred successfully."
           restartPolicy: OnFailure
           volumes:
             - name: ssh-key
