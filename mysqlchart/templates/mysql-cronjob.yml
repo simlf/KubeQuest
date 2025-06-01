@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-backup
+  namespace: default
+spec:
+  schedule: "*/5 * * * *" # Every five minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: mysql:latest
+              env:
+                - name: MYSQL_HOST
+                  value: "mysql-db.default.svc.cluster.local"
+                - name: MYSQL_USER
+                  value: "root"
+                - name: MYSQL_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: secret-mysql
+                      key: mysql-root-password
+              volumeMounts:
+                - name: ssh-key
+                  mountPath: /root/.ssh
+                  readOnly: true
+                - name: tmp
+                  mountPath: /backup
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  TIMESTAMP=$(date +%F_%H-%M)
+                  BACKUP_FILE="/backup/db_backup_$TIMESTAMP.sql"
+                  mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases > $BACKUP_FILE
+
+                  chmod 600 /root/.ssh/id_rsa
+                  scp -o StrictHostKeyChecking=no $BACKUP_FILE adminuser@158.158.32.28:/backups/
+          restartPolicy: OnFailure
+          volumes:
+            - name: ssh-key
+              secret:
+                secretName: ssh-key-secret
+            - name: tmp
+              emptyDir: {}

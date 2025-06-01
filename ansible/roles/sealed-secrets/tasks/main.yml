@@ -32,15 +32,6 @@
     dest: "{{ playbook_dir }}/mypublickey.pem"
     flat: yes
 
-# - name: Sealed local argocd secret
-#   local_action:
-#     module: shell
-#     _raw_params: |
-#       kubeseal --cert mypublickey.pem \
-#       --controller-namespace kube-system \
-#       --controller-name sealed-secrets \
-#       < "{{ playbook_dir }}/roles/argocd/files/argocd-secret.yml" > "{{ playbook_dir }}/roles/argocd/files/argocd-secret-sealedsecrets.yml"
-
 - name: Ask if user wants to generate sealed-secrets
   ansible.builtin.pause:
     prompt: "Do you want to generate sealed secrets? (yes/no)"
@@ -58,17 +49,15 @@
           --controller-name sealed-secrets \
           < "{{ playbook_dir }}/../mysqlchart/templates/mysql-secret.yml" > "{{ playbook_dir }}/../mysqlchart/templates/mysql-secret-sealedsecrets.yml"
 
-    # - name: Copy sealed-secrets MySQL secret
-    #   copy:
-    #     src: "{{ playbook_dir }}/roles/argocd/files/mysql-secret-sealedsecrets.yml"
-    #     dest: /tmp/mysql-secret-sealedsecrets.yml
-    #     owner: root
-    #     group: root
-    #     mode: "0644"
-
-    # - name: Apply sealed-secrets MySQL secret
-    #   shell: |
-    #     kubectl apply -f /tmp/mysql-secret-sealedsecrets.yml -n argocd
+    # Mysql secret
+    - name: Sealed local mysql backup secret
+      local_action:
+        module: shell
+        _raw_params: |
+          kubeseal --cert mypublickey.pem \
+          --controller-namespace kube-system \
+          --controller-name sealed-secrets \
+          < "{{ playbook_dir }}/../mysqlchart/templates/mysql-cronjob-secret.yml" > "{{ playbook_dir }}/../mysqlchart/templates/mysql-cronjob-secret-sealedsecrets.yml"
 
     # App secret
     - name: Sealed local app secret
@@ -80,17 +69,6 @@
           --controller-name sealed-secrets \
           < "{{ playbook_dir }}/../appchart/templates/database-secret.yml" > "{{ playbook_dir }}/../appchart/templates/database-secret-sealedsecrets.yml"
 
-    # - name: Copy sealed-secrets app secret
-    #   copy:
-    #     src: "{{ playbook_dir }}/../appchart/templates/database-secret-sealedsecrets.yml"
-    #     dest: /tmp/database-secret-sealedsecrets.yml
-    #     owner: root
-    #     group: root
-    #     mode: "0644"
-
-    # - name: Apply sealed-secrets app secret
-    #   shell: |
-    #     kubectl apply -f /tmp/database-secret-sealedsecrets.yml -n app
   when: user_sealed_secrets.user_input.lower() == 'yes'
 
 - name: Say to user that he should push the sealed secrets to the repository

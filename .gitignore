@@ -41,3 +41,4 @@ ansible/inventory.yml
 #app
 database-secret.yml
 mysql-secret.yml
+mysql-cronjob-secret.yml
