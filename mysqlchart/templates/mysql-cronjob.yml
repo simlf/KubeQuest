@@ -4,7 +4,7 @@ metadata:
   name: mysql-backup
   namespace: default
 spec:
-  schedule: "*/5 * * * *" # Every five minutes
+  schedule: "*/2 * * * *" # Every five minutes
   jobTemplate:
     spec:
       template:
