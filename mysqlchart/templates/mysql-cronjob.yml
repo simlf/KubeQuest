@@ -24,19 +24,22 @@ spec:
                       key: mysql-root-password
               volumeMounts:
                 - name: ssh-key
-                  mountPath: /root/.ssh
+                  mountPath: /secrets/ssh
                   readOnly: true
                 - name: tmp
                   mountPath: /backup
               command: ["/bin/sh", "-c"]
               args:
                 - |
+                  mkdir -p /root/.ssh
+                  cp /secrets/ssh/id_rsa /root/.ssh/id_rsa
+                  chmod 600 /root/.ssh/id_rsa
+
                   apk add --no-cache mysql-client openssh
                   TIMESTAMP=$(date +%F_%H-%M)
                   BACKUP_FILE="/backup/db_backup_$TIMESTAMP.sql"
                   mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases > $BACKUP_FILE
 
-                  chmod 600 /root/.ssh/id_rsa
                   scp -o StrictHostKeyChecking=no $BACKUP_FILE adminuser@158.158.32.28:/backups/
           restartPolicy: OnFailure
           volumes:
