@@ -1,13 +1,26 @@
-
 - name: Create ArgoCD Namespace
   shell: |
     kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 
-- name: Download ArgoCD manifest
-  get_url:
-    url: "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-    dest: "/tmp/argocd-install.yaml"
-    mode: "0644"
+- name: Copy secret
+  copy:
+    src: argocd-secret.yml
+    dest: /tmp/argocd-secret.yml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
+
+- name: Apply ArgoCD secret
+  shell: |
+    kubectl apply -f /tmp/argocd-secret.yml -n argocd
+
+- name: Copy ArgoCD install manifest
+  copy:
+    src: argocd-install.yml
+    dest: /tmp/argocd-install.yaml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
 
 - name: Apply ArgoCD manifest
   shell: |
@@ -25,18 +38,6 @@
   shell: |
     kubectl apply -f /tmp/argocd-ingress.yml -n argocd
 
-- name: Copy example-app
-  copy:
-    src: example-app.yml
-    dest: /tmp/example-app.yml
-    owner: root # Change owner if needed
-    group: root # Change group if needed
-    mode: "0644" # File permissions
-
-- name: Apply ArgoCD example app
-  shell: |
-    kubectl apply -f /tmp/example-app.yml -n argocd
-
 - name: Prepare the /mnt/data folder on the MySQL node
   become: true
   ansible.builtin.file:
@@ -44,32 +45,8 @@
     state: directory
     owner: 1001
     group: 1001
-    mode: '0755'
+    mode: "0755"
   register: mkdir_result
-
-- name: Copy mysql-storage
-  copy:
-    src: mysql-storage.yml
-    dest: /tmp/mysql-storage.yml
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Apply MySQL storage
-  shell: |
-    kubectl apply -f /tmp/mysql-storage.yml
-
-- name: Copy mysql-pvc
-  copy:
-    src: mysql-pvc.yml
-    dest: /tmp/mysql-pvc.yml
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Apply MySQL PVC
-  shell: |
-    kubectl apply -f /tmp/mysql-pvc.yml
 
 - name: Wait for argocd-server to be ready
   shell: kubectl wait pod --all --for=condition=Ready --namespace=argocd --timeout=600s
@@ -82,14 +59,14 @@
   debug:
     msg: "{{ argocd_admin_password.stdout }}"
 
-- name: Copy mysql-app
+- name: Copy argocd app
   copy:
-    src: mysql-app.yml
-    dest: /tmp/mysql-app.yml
-    owner: root
-    group: root
-    mode: "0644"
+    src: argocd-app.yml
+    dest: /tmp/argocd-app.yml
+    owner: root # Change owner if needed
+    group: root # Change group if needed
+    mode: "0644" # File permissions
 
-- name: Apply MySQL app
+- name: Apply ArgoCD app
   shell: |
-    kubectl apply -f /tmp/mysql-app.yml -n argocd
+    kubectl apply -f /tmp/argocd-app.yml -n argocd

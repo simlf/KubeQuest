@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: cley44/kubequest
+  tag: "1.2"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 443
+
+envSecretName: secret-mysql
+
+secret:
+  enabled: true
+  name: app-env-secret
+  data:
+    DB_HOST: mysql-db.default.svc.cluster.local
+    DB_DATABASE: kubequest
+    APP_KEY: qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+    APP_DEBUG: "true"
+    APP_ENV: local
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: kubequest.duckdns.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: app-tls
+      hosts:
+        - kubequest.duckdns.org

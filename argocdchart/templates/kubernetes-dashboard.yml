@@ -10,9 +10,9 @@ spec:
   source:
     repoURL: https://github.com/simlf/KubeQuest.git
     targetRevision: HEAD
-    path: ansible/roles/argocd/files/kubernetes-dashboard
+    path: kubernetes-dashboard
   destination:
-    server: https://kubernetes.default.svc
+    name: in-cluster
     namespace: kubernetes-dashboard
   syncPolicy:
     syncOptions:

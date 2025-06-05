@@ -30,6 +30,13 @@
               "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
               $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
               sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: Ensure Docker group exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+      register: docker_group
+
     - name: Install Docker packages
       ansible.builtin.apt:
         name:
@@ -41,18 +48,6 @@
         state: latest
         update_cache: yes
   when: docker_installed.failed
-# - name: Ensure Docker group exists
-#   ansible.builtin.group:
-#     name: docker
-#     state: present
-#   register: docker_group
-
-# - name: Add User to docker group
-#   ansible.builtin.user:
-#     name: k8s
-#     groups: docker
-#     append: true
-#   when: docker_group is changed
 
 # This is needed because docker is not CRI compatible anymore
 - name: Download cri-dockerd package
@@ -69,3 +64,9 @@
   file:
     path: "/tmp/cri-dockerd.deb"
     state: absent
+
+- name: Ensure docker service is enabled and started
+  systemd:
+    name: docker
+    enabled: true
+    state: started

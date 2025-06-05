@@ -1,0 +1,26 @@
+mysql:
+  auth:
+    existingSecret: secret-mysql
+    database: kubequest
+  architecture: standalone
+  primary:
+    persistence:
+      enabled: true
+      existingClaim: mysql-data-claim
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 512Mi
+        cpu: 500m
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 18

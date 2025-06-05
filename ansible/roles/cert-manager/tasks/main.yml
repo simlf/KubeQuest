@@ -1,0 +1,36 @@
+- name: Add cert manager Helm repository
+  shell: |
+    helm repo add jetstack https://charts.jetstack.io --force-update
+
+- name: Install cert manager
+  shell: |
+    helm install \
+      cert-manager jetstack/cert-manager \
+      --namespace cert-manager \
+      --create-namespace \
+      --version v1.17.2 \
+      --set 'extraArgs={--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=8.8.8.8:53\,1.1.1.1:53}' \
+      --set crds.enabled=true \
+      --set prometheus.enabled=false
+
+- name: Clone cert-manager webhook duckdns repository
+  git:
+    repo: https://github.com/ebrianne/cert-manager-webhook-duckdns.git
+    dest: /tmp/cert-manager-webhook-duckdns
+
+- name: Install cert-manager webhook duckdns
+  shell: |
+    helm install cert-manager-webhook-duckdns \
+    --namespace cert-manager \
+    --set duckdns.token='{{ parsed_env.DUCKDNS_TOKEN }}' \
+    --set clusterIssuer.production.create=true \
+    --set clusterIssuer.staging.create=true \
+    --set clusterIssuer.email='clement.chaban@epitech.eu' \
+    --set logLevel=2 \
+    /tmp/cert-manager-webhook-duckdns/deploy/cert-manager-webhook-duckdns
+
+- name: Wait for cert-manager webhook to be ready
+  shell: |
+    kubectl wait --for=condition=Ready pod -l app=cert-manager-webhook-duckdns \
+      --namespace cert-manager \
+      --timeout=120s

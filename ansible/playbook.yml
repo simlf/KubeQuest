@@ -47,17 +47,18 @@
   hosts: vm-kub-master
   roles:
     - nginx
-- name: Setup argocd
+
+- name: Setup cert-manager
   hosts: vm-kub-master
   roles:
-    - argocd
+    - cert-manager
 
 - name: Setup sealed-secrets
   hosts: vm-kub-master
   roles:
     - sealed-secrets
 
-- name: Setup vault
+- name: Setup argocd
   hosts: vm-kub-master
   roles:
-    - vault-secret
+    - argocd

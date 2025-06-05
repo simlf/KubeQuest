@@ -1,17 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: example-app
+  name: mysql-db
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
-    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    repoURL: https://github.com/simlf/KubeQuest.git
     targetRevision: HEAD
-    path: guestbook
+    path: mysqlchart
   destination:
     name: in-cluster
-    namespace: example
+    namespace: default
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true

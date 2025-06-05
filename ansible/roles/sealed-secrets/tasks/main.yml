@@ -1,0 +1,76 @@
+- name: Add helm sealed
+  shell: helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+
+- name: Install the Sealed Secrets Operator
+  shell: |
+    helm install sealed-secrets -n kube-system sealed-secrets/sealed-secrets
+
+- name: Download the Sealed Secrets Operator manifest
+  shell: |
+    wget "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.24.0/kubeseal-0.24.0-linux-amd64.tar.gz"
+
+- name: Extract the kubeseal binary
+  shell: |
+    tar -xvzf kubeseal-0.24.0-linux-amd64.tar.gz kubeseal
+
+- name: Move kubeseal to /usr/local/bin/kubeseal
+  shell: |
+    sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+
+- name: Wait for the Sealed Secrets Operator to be ready
+  shell: |
+    kubectl wait --for=condition=available --timeout=600s deployment/sealed-secrets -n kube-system
+
+# Get the public certificate and copy it to the local machine
+- name: Get the public certificate
+  shell: |
+    kubeseal --controller-namespace kube-system --controller-name sealed-secrets --fetch-cert > mypublickey.pem
+
+- name: Copy the public certificate to the local machine
+  fetch:
+    src: mypublickey.pem
+    dest: "{{ playbook_dir }}/mypublickey.pem"
+    flat: yes
+
+- name: Ask if user wants to generate sealed-secrets
+  ansible.builtin.pause:
+    prompt: "Do you want to generate sealed secrets? (yes/no)"
+  register: user_sealed_secrets
+
+- name: Generate sealed secrets
+  block:
+    # Mysql secret
+    - name: Sealed local mysql secret
+      local_action:
+        module: shell
+        _raw_params: |
+          kubeseal --cert mypublickey.pem \
+          --controller-namespace kube-system \
+          --controller-name sealed-secrets \
+          < "{{ playbook_dir }}/../mysqlchart/templates/mysql-secret.yml" > "{{ playbook_dir }}/../mysqlchart/templates/mysql-secret-sealedsecrets.yml"
+
+    # Mysql secret
+    - name: Sealed local mysql backup secret
+      local_action:
+        module: shell
+        _raw_params: |
+          kubeseal --cert mypublickey.pem \
+          --controller-namespace kube-system \
+          --controller-name sealed-secrets \
+          < "{{ playbook_dir }}/../mysqlchart/templates/mysql-cronjob-secret.yml" > "{{ playbook_dir }}/../mysqlchart/templates/mysql-cronjob-secret-sealedsecrets.yml"
+
+    # App secret
+    - name: Sealed local app secret
+      local_action:
+        module: shell
+        _raw_params: |
+          kubeseal --cert mypublickey.pem \
+          --controller-namespace kube-system \
+          --controller-name sealed-secrets \
+          < "{{ playbook_dir }}/../appchart/templates/database-secret.yml" > "{{ playbook_dir }}/../appchart/templates/database-secret-sealedsecrets.yml"
+
+  when: user_sealed_secrets.user_input.lower() == 'yes'
+
+- name: Say to user that he should push the sealed secrets to the repository
+  ansible.builtin.pause:
+    prompt: "You should push the sealed secrets to your repository (press any key to continue)."
