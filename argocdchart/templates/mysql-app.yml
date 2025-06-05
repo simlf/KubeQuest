@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/simlf/KubeQuest.git
-    targetRevision: feat-app-chart
+    targetRevision: HEAD
     path: mysqlchart
   destination:
     name: in-cluster

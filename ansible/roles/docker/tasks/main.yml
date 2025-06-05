@@ -49,13 +49,6 @@
         update_cache: yes
   when: docker_installed.failed
 
-# - name: Add User to docker group
-#   ansible.builtin.user:
-#     name: k8s
-#     groups: docker
-#     append: true
-#   when: docker_group is changed
-
 # This is needed because docker is not CRI compatible anymore
 - name: Download cri-dockerd package
   get_url:
