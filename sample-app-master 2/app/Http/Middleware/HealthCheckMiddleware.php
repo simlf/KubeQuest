@@ -9,7 +9,7 @@ class HealthCheckMiddleware
 {
     /**
      * Handle an incoming request.
-     * Ce middleware s'assure que les health checks peuvent toujours passer
+     * This middleware ensures that health checks can always pass through
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
@@ -17,10 +17,10 @@ class HealthCheckMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // Vérifier si c'est une route de health check
+        // Check if this is a health check route
         if ($this->isHealthCheckRoute($request)) {
-            // Bypasser certaines vérifications pour les health checks
-            // Par exemple, ignorer les vérifications CSRF, etc.
+            // Bypass certain checks for health checks
+            // For example, ignore CSRF verification, etc.
             return $next($request);
         }
 
@@ -28,7 +28,7 @@ class HealthCheckMiddleware
     }
 
     /**
-     * Détermine si la requête est pour un health check
+     * Determine if the request is for a health check
      */
     private function isHealthCheckRoute(Request $request): bool
     {

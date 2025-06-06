@@ -1,10 +1,10 @@
 <?php
 /**
- * Script de test pour vérifier les health checks
- * À exécuter pour tester les endpoints avant déploiement
+ * Test script to verify health checks
+ * Run to test endpoints before deployment
  */
 
-$base_url = 'http://localhost:8000'; // Adapter selon votre configuration
+$base_url = 'http://localhost:8000'; // Adjust according to your configuration
 
 $endpoints = [
     '/health/startup',
@@ -15,8 +15,8 @@ $endpoints = [
     '/api/health/live'
 ];
 
-echo "🏥 Test des Health Check Endpoints\n";
-echo "==================================\n\n";
+echo "🏥 Health Check Endpoints Testing\n";
+echo "=================================\n\n";
 
 foreach ($endpoints as $endpoint) {
     $url = $base_url . $endpoint;
@@ -27,7 +27,7 @@ foreach ($endpoints as $endpoint) {
     $end_time = microtime(true);
     
     if ($response === false) {
-        echo "❌ ERREUR: Impossible d'accéder à $endpoint\n";
+        echo "❌ ERROR: Cannot access $endpoint\n";
     } else {
         $response_time = round(($end_time - $start_time) * 1000, 2);
         $data = json_decode($response, true);
@@ -43,14 +43,14 @@ foreach ($endpoints as $endpoint) {
                 }
             }
         } else {
-            echo "❌ Réponse invalide\n";
+            echo "❌ Invalid response\n";
         }
     }
     echo "\n";
 }
 
-echo "Test terminé!\n";
-echo "\n📝 Pour utiliser ces endpoints avec Kubernetes:\n";
+echo "Testing completed!\n";
+echo "\n📝 To use these endpoints with Kubernetes:\n";
 echo "- Startup: /health/startup\n";
 echo "- Readiness: /health/ready\n";
 echo "- Liveness: /health/live\n";

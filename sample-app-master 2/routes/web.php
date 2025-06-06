@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome', ['value' => $value]);
 });
 
-// Health Check Routes pour Kubernetes Probes
+// Health Check Routes for Kubernetes Probes
 Route::get('/health/startup', [HealthController::class, 'startup'])->name('health.startup');
 Route::get('/health/ready', [HealthController::class, 'readiness'])->name('health.readiness');
 Route::get('/health/live', [HealthController::class, 'liveness'])->name('health.liveness');

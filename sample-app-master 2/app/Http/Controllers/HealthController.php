@@ -10,8 +10,8 @@ use Exception;
 class HealthController extends Controller
 {
     /**
-     * Startup Probe - Vérifie que l'application a démarré correctement
-     * Cette probe est appelée au démarrage pour s'assurer que l'app est initialisée
+     * Startup Probe - Checks that the application has started correctly
+     * This probe is called at startup to ensure the app is initialized
      */
     public function startup()
     {
@@ -34,8 +34,8 @@ class HealthController extends Controller
     }
 
     /**
-     * Readiness Probe - Vérifie que l'application est prête à recevoir du trafic
-     * Cette probe détermine si le pod doit recevoir du trafic
+     * Readiness Probe - Checks that the application is ready to receive traffic
+     * This probe determines if the pod should receive traffic
      */
     public function readiness()
     {
@@ -58,8 +58,8 @@ class HealthController extends Controller
     }
 
     /**
-     * Liveness Probe - Vérifie que l'application fonctionne correctement
-     * Cette probe détermine si le pod doit être redémarré
+     * Liveness Probe - Checks that the application is functioning correctly
+     * This probe determines if the pod should be restarted
      */
     public function liveness()
     {
@@ -81,12 +81,12 @@ class HealthController extends Controller
     }
 
     /**
-     * Vérifications privées
+     * Private health check methods
      */
     private function checkConfig()
     {
         try {
-            // Vérifier les variables d'environnement critiques
+            // Check critical environment variables
             $required_config = ['app.key', 'database.default', 'app.env'];
             
             foreach ($required_config as $config_key) {
@@ -121,7 +121,7 @@ class HealthController extends Controller
     private function checkDatabaseOperations()
     {
         try {
-            // Test spécifique à l'application KubeQuest - vérifier que la table Counter existe et fonctionne
+            // KubeQuest specific test - check that Counter table exists and works
             $startTime = microtime(true);
             $count = DB::table('counters')->count();
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
@@ -154,7 +154,7 @@ class HealthController extends Controller
                 }
             }
             
-            // Test d'écriture
+            // Write test
             $testFile = storage_path('logs/health_check_test.txt');
             file_put_contents($testFile, 'health check test');
             if (!file_exists($testFile)) {
@@ -171,15 +171,15 @@ class HealthController extends Controller
     private function checkLaravelBasics()
     {
         try {
-            // Vérifier que Laravel fonctionne correctement
+            // Check that Laravel is working correctly
             $checks = [];
             
-            // Vérifier l'APP_KEY
+            // Check APP_KEY
             if (!config('app.key')) {
                 return ['status' => 'unhealthy', 'message' => 'APP_KEY not set'];
             }
             
-            // Vérifier que les services Laravel fonctionnent
+            // Check that Laravel services are working
             app('view');
             app('session');
             
@@ -195,16 +195,16 @@ class HealthController extends Controller
             $key = 'health_check_' . time();
             $value = 'test_value';
             
-            // Test d'écriture cache
+            // Cache write test
             Cache::put($key, $value, 60);
             
-            // Test de lecture cache
+            // Cache read test
             $retrieved = Cache::get($key);
             if ($retrieved !== $value) {
                 return ['status' => 'unhealthy', 'message' => 'Cache read/write failed'];
             }
             
-            // Nettoyage
+            // Cleanup
             Cache::forget($key);
             
             return ['status' => 'healthy', 'message' => 'Cache working correctly'];
@@ -219,7 +219,7 @@ class HealthController extends Controller
         $memory_peak = memory_get_peak_usage(true);
         $memory_limit = $this->convertToBytes(ini_get('memory_limit'));
         
-        // Vérifier si on approche de la limite (90%)
+        // Check if approaching limit (90%)
         if ($memory_usage > $memory_limit * 0.9) {
             return [
                 'status' => 'unhealthy', 
@@ -241,7 +241,7 @@ class HealthController extends Controller
     private function checkDependencies()
     {
         try {
-            // Vérifier les extensions PHP requises
+            // Check required PHP extensions
             $required_extensions = ['pdo', 'mbstring', 'openssl', 'json'];
             $missing_extensions = [];
             
@@ -269,7 +269,7 @@ class HealthController extends Controller
         $memory_usage = memory_get_usage(true);
         $memory_limit = $this->convertToBytes(ini_get('memory_limit'));
         
-        // Alerte si plus de 95% de la mémoire est utilisée (pour liveness)
+        // Alert if more than 95% memory is used (for liveness)
         if ($memory_usage > $memory_limit * 0.95) {
             return [
                 'status' => 'unhealthy', 
@@ -288,8 +288,8 @@ class HealthController extends Controller
     private function checkApplication()
     {
         try {
-            // Test spécifique à KubeQuest - vérifier que l'application répond correctement
-            // Simuler une opération basique de l'app
+            // KubeQuest specific test - check that application responds correctly
+            // Simulate basic app operation
             $testValue = DB::table('counters')->sum('count') ?? 0;
             
             return [
@@ -305,15 +305,15 @@ class HealthController extends Controller
     private function checkLaravelHealth()
     {
         try {
-            // Vérifications spécifiques Laravel
+            // Laravel specific checks
             $checks = [];
             
-            // Vérifier que l'application n'est pas en mode maintenance
+            // Check that application is not in maintenance mode
             if (app()->isDownForMaintenance()) {
                 return ['status' => 'unhealthy', 'message' => 'Application in maintenance mode'];
             }
             
-            // Vérifier la version Laravel
+            // Check Laravel version
             $version = app()->version();
             
             return [
