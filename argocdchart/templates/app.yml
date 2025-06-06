@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/simlf/KubeQuest.git
-    targetRevision: HEAD
+    targetRevision: feat/probes
     path: appchart
   destination:
     name: in-cluster
