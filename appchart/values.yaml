@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: cley44/kubequest
-  tag: "1.2"
+  tag: "1.3"
   pullPolicy: IfNotPresent
 
 # Health Probes configuration
@@ -17,9 +17,9 @@ healthProbes:
     initialDelaySeconds: 5
     periodSeconds: 5
     timeoutSeconds: 3
-    failureThreshold: 30  
+    failureThreshold: 30
     successThreshold: 1
-  
+
   readiness:
     enabled: true
     httpGet:
@@ -31,7 +31,7 @@ healthProbes:
     timeoutSeconds: 3
     failureThreshold: 3
     successThreshold: 1
-  
+
   liveness:
     enabled: true
     httpGet:
