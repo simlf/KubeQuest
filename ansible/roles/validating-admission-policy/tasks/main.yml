@@ -1,0 +1,21 @@
+- name: Copy policy file to the vm
+  copy:
+    src: policy.yml
+    dest: /tmp/policy.yml
+
+- name: Apply policy
+  shell: |
+    kubectl apply -f /tmp/policy.yml
+
+- name: Copy binding file to the vm
+  copy:
+    src: binding.yml
+    dest: /tmp/binding.yml
+
+- name: Apply binding
+  shell: |
+    kubectl apply -f /tmp/binding.yml
+
+- name: Wait for the ValidatingAdmissionPolicy to be ready
+  shell: |
+    kubectl wait --for=condition=Ready validatingadmissionpolicy require-cpu-mem-limits-requests --timeout=60s
