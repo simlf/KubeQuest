@@ -5,6 +5,48 @@ image:
   tag: "1.2"
   pullPolicy: IfNotPresent
 
+# Health Probes configuration
+healthProbes:
+  enabled: true
+  # Startup Probe - vérifie que l'app a démarré (important pour les apps lentes à démarrer)
+  startup:
+    enabled: true
+    httpGet:
+      path: /health/startup
+      port: 80
+      scheme: HTTP
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 30  # 30 * 5 = 150 secondes max pour le démarrage
+    successThreshold: 1
+  
+  # Readiness Probe - vérifie que l'app est prête à recevoir du trafic
+  readiness:
+    enabled: true
+    httpGet:
+      path: /health/ready
+      port: 80
+      scheme: HTTP
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+    successThreshold: 1
+  
+  # Liveness Probe - vérifie que l'app fonctionne correctement
+  liveness:
+    enabled: true
+    httpGet:
+      path: /health/live
+      port: 80
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
 service:
   type: ClusterIP
   port: 443

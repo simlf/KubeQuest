@@ -18,6 +18,44 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
+          {{- if .Values.healthProbes.enabled }}
+          {{- if .Values.healthProbes.startup.enabled }}
+          startupProbe:
+            httpGet:
+              path: "{{ .Values.healthProbes.startup.httpGet.path }}"
+              port: {{ .Values.healthProbes.startup.httpGet.port }}
+              scheme: "{{ .Values.healthProbes.startup.httpGet.scheme }}"
+            initialDelaySeconds: {{ .Values.healthProbes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthProbes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthProbes.startup.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthProbes.startup.failureThreshold }}
+            successThreshold: {{ .Values.healthProbes.startup.successThreshold }}
+          {{- end }}
+          {{- if .Values.healthProbes.readiness.enabled }}
+          readinessProbe:
+            httpGet:
+              path: "{{ .Values.healthProbes.readiness.httpGet.path }}"
+              port: {{ .Values.healthProbes.readiness.httpGet.port }}
+              scheme: "{{ .Values.healthProbes.readiness.httpGet.scheme }}"
+            initialDelaySeconds: {{ .Values.healthProbes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthProbes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthProbes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthProbes.readiness.failureThreshold }}
+            successThreshold: {{ .Values.healthProbes.readiness.successThreshold }}
+          {{- end }}
+          {{- if .Values.healthProbes.liveness.enabled }}
+          livenessProbe:
+            httpGet:
+              path: "{{ .Values.healthProbes.liveness.httpGet.path }}"
+              port: {{ .Values.healthProbes.liveness.httpGet.port }}
+              scheme: "{{ .Values.healthProbes.liveness.httpGet.scheme }}"
+            initialDelaySeconds: {{ .Values.healthProbes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthProbes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthProbes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthProbes.liveness.failureThreshold }}
+            successThreshold: {{ .Values.healthProbes.liveness.successThreshold }}
+          {{- end }}
+          {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.envSecretName }}
