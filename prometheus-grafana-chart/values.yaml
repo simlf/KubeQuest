@@ -1,0 +1,10 @@
+kube-prometheus-stack:
+  grafana:
+    adminPassword: admin
+    service:
+      type: NodePort
+  prometheus:
+    service:
+      type: NodePort
+  alertmanager:
+    enabled: false
