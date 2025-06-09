@@ -3,6 +3,10 @@ kube-prometheus-stack:
     adminPassword: admin
     service:
       type: NodePort
+    ingress:
+      enabled: true
+      hosts:
+        - grafana.local.tcloud
   prometheus:
     service:
       type: NodePort
