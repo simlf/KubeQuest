@@ -1,0 +1,41 @@
+name: Validate YAML Files
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+jobs:
+  validate-yaml:
+    name: Validate YAML files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Validate YAML
+        uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_config_filepath: './.yamllint.yaml'
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv kubectl /usr/local/bin/
+
+      - name: Validate Kustomize
+        run: |
+          find . -name 'kustomization.yaml' | while read kustomization; do
+            dir=$(dirname "$kustomization")
+            echo "Validating kustomize syntax in $dir"
+            if kubectl kustomize --enable-helm "$dir" > /dev/null 2>&1; then
+              echo "✅ Success: Kustomization valid in $dir"
+            else
+              echo "❌ Error: Kustomization failed in $dir"
+              kubectl kustomize "$dir"
+            fi
+          done
+          echo "✅ All kustomizations validated successfully."
