@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/simlf/KubeQuest'
-    targetRevision: HEAD
+    targetRevision: feat/logging-system-refactoring
     path: prometheus-grafana-chart
   destination:
     server: https://kubernetes.default.svc

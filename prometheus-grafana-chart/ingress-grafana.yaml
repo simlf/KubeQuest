@@ -16,4 +16,6 @@ spec:
               service:
                 name: kube-prometheus-stack-grafana
                 port:
-                  number: 80
+                  number: 443
+      host: grafana.local.tcloud
+
