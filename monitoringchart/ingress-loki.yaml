@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lokiingress
+  namespace: monitoring
+  annotations:
+  cert-manager.io/cluster-issuer: cert-manager-webhook-duckdns-production
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - loki-kubequest.duckdns.org
+      secretName: loki-tls
+  rules:
+    - host: loki-kubequest.duckdns.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: loki
+                port:
+                  number: 3100
+

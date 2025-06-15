@@ -1,0 +1,12 @@
+kube-prometheus-stack:
+  grafana:
+    adminPassword: admin
+    service: {}
+    ingress:
+      enabled: true
+      hosts:
+        - grafana-kubequest.duckdns.org
+  prometheus:
+    service: {}
+  alertmanager:
+    enabled: false
