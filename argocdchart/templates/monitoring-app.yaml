@@ -10,7 +10,7 @@ spec:
     targetRevision: feat/logging-system-refactoring
     path: prometheus-grafana-chart
   destination:
-    server: https://kubernetes.default.svc
+    name: in-cluster
     namespace: monitoring
   syncPolicy:
     automated:
