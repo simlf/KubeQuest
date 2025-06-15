@@ -1,0 +1,22 @@
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: filesystem
+  persistence:
+    enabled: true
+    existingClaim: loki-data-claim
+  serviceMonitor:
+    enabled: true
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 1
+    requests:
+      memory: 512Mi
+      cpu: 500m 

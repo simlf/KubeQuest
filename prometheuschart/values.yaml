@@ -1,0 +1,28 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    podMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    podMonitorNamespaceSelector: {}
+    ruleSelectorNilUsesHelmValues: false
+    ruleSelector: {}
+    ruleNamespaceSelector: {}
+    probeSelectorNilUsesHelmValues: false
+    probeSelector: {}
+    probeNamespaceSelector: {}
+    scrapeConfigSelectorNilUsesHelmValues: false
+    scrapeConfigSelector: {}
+    scrapeConfigNamespaceSelector: {}
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 512Mi
+        cpu: 500m 

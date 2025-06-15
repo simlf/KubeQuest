@@ -1,0 +1,21 @@
+grafana:
+  admin:
+    existingSecret: secret-grafana
+  persistence:
+    enabled: true
+    existingClaim: grafana-data-claim
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: false
+  tolerations:
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 1
+    requests:
+      memory: 512Mi
+      cpu: 500m 
