@@ -4,11 +4,13 @@ metadata:
   name: grafana-ingress
   namespace: monitoring
   annotations:
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  cert-manager.io/cluster-issuer: cert-manager-webhook-duckdns-production
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana-kubequest.duckdns.org
+      secretName: grafana-tls
   rules:
     - host: grafana-kubequest.duckdns.org
       http:
@@ -17,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: prometheus-grafana-grafana
+                name: prometheus-grafana
                 port:
                   number: 80
 
