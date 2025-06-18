@@ -7,7 +7,7 @@ prometheus:
           storageClassName: "prometheus-local-storage"
           resources:
             requests:
-              storage: 6Gi
+              storage: 10Gi
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists

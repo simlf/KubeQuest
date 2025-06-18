@@ -8,7 +8,7 @@ metadata:
     storage: prometheus
 spec:
   capacity:
-    storage: 6Gi
+    storage: 10Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
