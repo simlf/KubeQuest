@@ -1,3 +1,4 @@
+# Désactiver complètement Alertmanager
 alertmanager:
   enabled: false
   alertmanagerSpec:
@@ -6,7 +7,10 @@ alertmanager:
       enabled: false
     persistentVolumeClaim:
       enabled: false
+    retention: 0
+    replicas: 0
 
+# Configuration Prometheus
 prometheus:
   prometheusSpec:
     storageSpec:
@@ -37,3 +41,16 @@ prometheus:
     livenessProbe:
       initialDelaySeconds: 30
       timeoutSeconds: 5
+
+# Désactiver les composants optionnels si nécessaire
+grafana:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+pushgateway:
+  enabled: true
