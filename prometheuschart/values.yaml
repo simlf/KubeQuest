@@ -1,17 +1,15 @@
 prometheus:
   prometheusSpec:
-    alertmanager:
-      enabled: false
     storageSpec:
       volumeClaimTemplate:
-        metadata:
-          name: prometheus-data
         spec:
           accessModes: ["ReadWriteOnce"]
           storageClassName: local-storage
           resources:
             requests:
               storage: 6Gi
+    alertmanager:
+      enabled: false
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
