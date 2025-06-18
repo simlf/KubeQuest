@@ -1,10 +1,15 @@
-# Configuration pour kube-prometheus-stack sans Alertmanager
+# Configuration optimisée pour kube-prometheus-stack basée sur la documentation officielle
+# https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+
 kube-prometheus-stack:
+  # Désactiver Alertmanager (comme demandé)
   alertmanager:
     enabled: false
   
+  # Configuration Prometheus optimisée
   prometheus:
     prometheusSpec:
+      # Configuration du stockage persistant
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -14,34 +19,104 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 10Gi
+      
+      # Tolérations pour les nœuds control-plane
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
+      
+      # NodeSelector pour cibler le nœud spécifique
       nodeSelector:
         kubernetes.io/hostname: k8s-server
+      
+      # Ressources optimisées selon la documentation
       resources:
         limits:
           memory: 2Gi
-          cpu: 1
+          cpu: 1000m
         requests:
           memory: 1Gi
           cpu: 500m
+      
+      # Configuration des probes de santé
       readinessProbe:
         initialDelaySeconds: 30
         timeoutSeconds: 5
+        periodSeconds: 10
       livenessProbe:
         initialDelaySeconds: 30
         timeoutSeconds: 5
+        periodSeconds: 10
+      
+      # Configuration de rétention des données
+      retention: 15d
+      retentionSize: "5GB"
+      
+      # Configuration des règles de scraping
+      scrapeInterval: 30s
+      evaluationInterval: 30s
 
+  # Désactiver Grafana (comme demandé)
   grafana:
     enabled: false
 
+  # Activer kube-state-metrics pour les métriques Kubernetes
   kube-state-metrics:
     enabled: true
+    metricLabelsAllowlist:
+      - pods=[app,instance,namespace,pod,container]
+      - nodes=[instance,os,arch]
+      - services=[app,namespace,service]
 
+  # Activer prometheus-node-exporter pour les métriques des nœuds
   prometheus-node-exporter:
     enabled: true
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
 
+  # Activer prometheus-pushgateway (optionnel)
   prometheus-pushgateway:
     enabled: true
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+
+  # Configuration des règles Prometheus
+  prometheusRule:
+    enabled: true
+    additionalScrapeConfigs: []
+
+  # Configuration des ServiceMonitors
+  defaultRules:
+    create: true
+    rules:
+      alertmanager: false  # Désactivé car Alertmanager est désactivé
+      configReloaders: true
+      etcd: true
+      general: true
+      k8s: true
+      kubeApiserverAvailability: true
+      kubeApiserverBurnrate: true
+      kubeApiserverHistogram: true
+      kubeApiserverSlos: true
+      kubeControllerManager: true
+      kubelet: true
+      kubeProxy: true
+      kubePrometheusGeneral: true
+      kubePrometheusNodeRecording: true
+      kubeScheduler: true
+      kubeStateMetrics: true
+      kubernetesApps: true
+      kubernetesResources: true
+      kubernetesStorage: true
+      kubernetesSystem: true
+      kubeVersion: true
+      namespaceByPod: true
+      namespaceByWorkload: true
+      node: true
+      prometheus: true
+      prometheusOperator: true
