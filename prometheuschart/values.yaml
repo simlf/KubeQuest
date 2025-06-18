@@ -1,7 +1,5 @@
 prometheus:
   prometheusSpec:
-    alertmanager:
-      enabled: false
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -12,6 +10,7 @@ prometheus:
               storage: 6Gi
           selector:
             matchLabels:
+              app: prometheus
               type: local
     tolerations:
       - key: node-role.kubernetes.io/control-plane
