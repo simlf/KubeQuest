@@ -6,14 +6,19 @@ prometheus:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
-          storageClassName: local-storage
+          storageClassName: "local-storage"
           resources:
             requests:
               storage: 6Gi
+          selector:
+            matchLabels:
+              type: local
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
+    nodeSelector:
+      kubernetes.io/hostname: k8s-server
     resources:
       limits:
         memory: 2Gi
