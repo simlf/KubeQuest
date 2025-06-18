@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-diagnostic-scripts
+  namespace: monitoring
+data:
+  check-storage.sh: |
+    #!/bin/bash
+    echo "=== Prometheus Storage Diagnostic ==="
+    echo "Date: $(date)"
+    echo ""
+    
+    echo "1. Checking StorageClass:"
+    kubectl get storageclass prometheus-local-storage -o wide
+    echo ""
+    
+    echo "2. Checking PersistentVolume:"
+    kubectl get pv prometheus-pv -o wide
+    echo ""
+    
+    echo "3. Checking PersistentVolumeClaim:"
+    kubectl get pvc -n monitoring | grep prometheus
+    echo ""
+    
+    echo "4. Detailed PVC description:"
+    kubectl describe pvc -n monitoring | grep -A 20 "prometheus"
+    echo ""
+    
+    echo "5. Checking node affinity:"
+    kubectl get nodes -o wide
+    echo ""
+    
+    echo "6. Checking storage directory on k8s-server:"
+    kubectl run storage-check --image=busybox:1.35 --rm -it --restart=Never \
+      --overrides='{"spec":{"nodeSelector":{"kubernetes.io/hostname":"k8s-server"},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}' \
+      -- sh -c "ls -la /mnt/prometheus || echo 'Directory does not exist'"
+    echo ""
+    
+    echo "=== Diagnostic Complete ===" 

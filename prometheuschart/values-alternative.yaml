@@ -4,15 +4,12 @@ prometheus:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
-          storageClassName: "prometheus-local-storage"
           resources:
             requests:
               storage: 6Gi
-          selector:
-            matchLabels:
-              app: prometheus
-              type: local
-              storage: prometheus
+          volumeMode: Filesystem
+          # Configuration alternative avec hostPath
+          volumeName: prometheus-hostpath
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
@@ -31,4 +28,4 @@ prometheus:
       timeoutSeconds: 5
     livenessProbe:
       initialDelaySeconds: 30
-      timeoutSeconds: 5
+      timeoutSeconds: 5 
