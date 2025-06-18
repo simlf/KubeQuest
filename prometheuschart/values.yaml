@@ -1,68 +1,47 @@
-# Désactiver complètement Alertmanager
-alertmanager:
-  enabled: false
-  alertmanagerSpec:
-    enabled: false
-    storage:
-      enabled: false
-    persistentVolumeClaim:
-      enabled: false
-    retention: 0
-    replicas: 0
-    resources:
-      limits:
-        memory: 0
-        cpu: 0
-      requests:
-        memory: 0
-        cpu: 0
-
-# Configuration Prometheus
-prometheus:
-  prometheusSpec:
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          storageClassName: "prometheus-local-storage"
-          volumeName: "prometheus-pv"
-          resources:
-            requests:
-              storage: 10Gi
-    tolerations:
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
-    nodeSelector:
-      kubernetes.io/hostname: k8s-server
-    resources:
-      limits:
-        memory: 2Gi
-        cpu: 1
-      requests:
-        memory: 1Gi
-        cpu: 500m
-    readinessProbe:
-      initialDelaySeconds: 30
-      timeoutSeconds: 5
-    livenessProbe:
-      initialDelaySeconds: 30
-      timeoutSeconds: 5
-
-# Désactiver les composants optionnels si nécessaire
-grafana:
-  enabled: false
-
-kubeStateMetrics:
-  enabled: true
-
-nodeExporter:
-  enabled: true
-
-pushgateway:
-  enabled: true
-
-# Forcer la désactivation d'Alertmanager au niveau global
-global:
+# Configuration pour kube-prometheus-stack sans Alertmanager
+kube-prometheus-stack:
   alertmanager:
     enabled: false
+  
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "prometheus-local-storage"
+            volumeName: "prometheus-pv"
+            resources:
+              requests:
+                storage: 10Gi
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      nodeSelector:
+        kubernetes.io/hostname: k8s-server
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: 1
+        requests:
+          memory: 1Gi
+          cpu: 500m
+      readinessProbe:
+        initialDelaySeconds: 30
+        timeoutSeconds: 5
+      livenessProbe:
+        initialDelaySeconds: 30
+        timeoutSeconds: 5
+
+  grafana:
+    enabled: false
+
+  kube-state-metrics:
+    enabled: true
+
+  prometheus-node-exporter:
+    enabled: true
+
+  prometheus-pushgateway:
+    enabled: true
