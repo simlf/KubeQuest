@@ -1,5 +1,11 @@
 alertmanager:
   enabled: false
+  alertmanagerSpec:
+    enabled: false
+    storage:
+      enabled: false
+    persistentVolumeClaim:
+      enabled: false
 
 prometheus:
   prometheusSpec:
