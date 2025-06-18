@@ -1,5 +1,12 @@
 prometheus:
   prometheusSpec:
+    server:
+      persistentVolume:
+        enabled: true
+        storageClass: local-storage
+        size: 8Gi
+    alertmanager:
+      enabled: false
     storageSpec:
       volumeClaimTemplate:
         metadata:
@@ -27,6 +34,3 @@ prometheus:
     livenessProbe:
       initialDelaySeconds: 30
       timeoutSeconds: 5
-    alertmanager:
-      enabled: false
-
