@@ -1,10 +1,5 @@
 prometheus:
   prometheusSpec:
-    server:
-      persistentVolume:
-        enabled: true
-        storageClass: local-storage
-        size: 8Gi
     alertmanager:
       enabled: false
     storageSpec:

@@ -26,6 +26,3 @@ spec:
               operator: In
               values:
                 - k8s-server
-  claimRef:
-    namespace: monitoring
-    name: prometheus-app-server
