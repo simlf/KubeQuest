@@ -28,4 +28,4 @@ spec:
                 - k8s-server
   claimRef:
     namespace: monitoring
-    name: prometheus-data-prometheus-app-0
+    name: prometheus-app-server
