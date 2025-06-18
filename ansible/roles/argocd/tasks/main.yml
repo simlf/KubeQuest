@@ -48,6 +48,15 @@
     mode: "0755"
   register: mkdir_result
 
+- name: Prepare the /mnt/prometheus folder on the Prometheus node
+  become: true
+  ansible.builtin.file:
+    path: /mnt/prometheus
+    state: directory
+    owner: 65534
+    group: 65534
+    mode: "0755"
+
 - name: Wait for argocd-server to be ready
   shell: kubectl wait pod --all --for=condition=Ready --namespace=argocd --timeout=600s
 

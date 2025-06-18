@@ -1,28 +1,29 @@
 prometheus:
   prometheusSpec:
-    serviceMonitorSelectorNilUsesHelmValues: false
-    serviceMonitorSelector: {}
-    serviceMonitorNamespaceSelector: {}
-    podMonitorSelectorNilUsesHelmValues: false
-    podMonitorSelector: {}
-    podMonitorNamespaceSelector: {}
-    ruleSelectorNilUsesHelmValues: false
-    ruleSelector: {}
-    ruleNamespaceSelector: {}
-    probeSelectorNilUsesHelmValues: false
-    probeSelector: {}
-    probeNamespaceSelector: {}
-    scrapeConfigSelectorNilUsesHelmValues: false
-    scrapeConfigSelector: {}
-    scrapeConfigNamespaceSelector: {}
+    storageSpec:
+      volumeClaimTemplate:
+        metadata:
+          name: prometheus-data
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: local-storage
+          resources:
+            requests:
+              storage: 6Gi
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
     resources:
       limits:
-        memory: 1Gi
+        memory: 2Gi
         cpu: 1
       requests:
-        memory: 512Mi
-        cpu: 500m 
+        memory: 1Gi
+        cpu: 500m
+    readinessProbe:
+      initialDelaySeconds: 30
+      timeoutSeconds: 5
+    livenessProbe:
+      initialDelaySeconds: 30
+      timeoutSeconds: 5
