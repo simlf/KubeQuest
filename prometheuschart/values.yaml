@@ -5,6 +5,7 @@ prometheus:
         spec:
           accessModes: ["ReadWriteOnce"]
           storageClassName: "prometheus-local-storage"
+          volumeName: "prometheus-pv"
           resources:
             requests:
               storage: 10Gi
