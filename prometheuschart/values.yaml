@@ -28,5 +28,5 @@ prometheus:
       initialDelaySeconds: 30
       timeoutSeconds: 5
     alertmanager:
-  enabled: false
+      enabled: false
 
