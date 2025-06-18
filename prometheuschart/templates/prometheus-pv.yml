@@ -25,4 +25,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - k8s-server 
+                - k8s-server
+  claimRef:
+    namespace: monitoring
+    name: prometheus-data-prometheus-app-0
