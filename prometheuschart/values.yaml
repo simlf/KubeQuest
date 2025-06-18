@@ -8,11 +8,6 @@ prometheus:
           resources:
             requests:
               storage: 6Gi
-          selector:
-            matchLabels:
-              app: prometheus
-              type: local
-              storage: prometheus
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
