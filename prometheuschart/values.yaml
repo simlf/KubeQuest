@@ -9,6 +9,13 @@ alertmanager:
       enabled: false
     retention: 0
     replicas: 0
+    resources:
+      limits:
+        memory: 0
+        cpu: 0
+      requests:
+        memory: 0
+        cpu: 0
 
 # Configuration Prometheus
 prometheus:
@@ -54,3 +61,8 @@ nodeExporter:
 
 pushgateway:
   enabled: true
+
+# Forcer la désactivation d'Alertmanager au niveau global
+global:
+  alertmanager:
+    enabled: false
