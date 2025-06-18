@@ -10,7 +10,10 @@ spec:
   source:
     repoURL: https://github.com/simlf/KubeQuest.git
     targetRevision: feat/logging-system-refactoring
-    path: prometheuschart  
+    path: prometheuschart
+    helm:
+      valueFiles:
+        - values.yaml
   destination:
     name: in-cluster
     namespace: monitoring
