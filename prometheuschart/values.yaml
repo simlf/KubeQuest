@@ -8,7 +8,7 @@ prometheus:
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     persistentVolume:
-      enabled: true
+      enabled: false
       existingClaim: prometheus-pvc
     serviceAccount:
       create: true
