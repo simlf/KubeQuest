@@ -1,16 +1,22 @@
-kube-prometheus-stack:
-  prometheus:
+prometheus:
+  server:
+    enabled: true
     ingress:
-      enabled: false
-  grafana:
+      enabled: true
+      hosts:
+        - prometheus-kubequest.duckdns.org
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+
+  alertmanager:
     enabled: false
 
-metallb:
-  enabled: true
-  ipRange: "10.0.1.242-10.0.1.250"
+  pushgateway:
+    enabled: false
 
-ingress:
-  enabled: true
-  host: "prometheus-kubequest.duckdns.org"
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  nodeExporter:
+    enabled: false
+
+  serviceAccounts:
+    server:
+      create: true
