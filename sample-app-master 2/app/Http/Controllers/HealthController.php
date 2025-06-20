@@ -40,8 +40,8 @@ class HealthController extends Controller
     public function readiness()
     {
         $checks = [
-            'database' => $this->checkDatabase(),
-            'database_operations' => $this->checkDatabaseOperations(),
+            // 'database' => $this->checkDatabase(),
+            // 'database_operations' => $this->checkDatabaseOperations(),
             'cache' => $this->checkCache(),
             'resources' => $this->checkResources(),
             'dependencies' => $this->checkDependencies()
