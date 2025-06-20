@@ -1,0 +1,71 @@
+name: "Terraform plan"
+
+on:
+  pull_request:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+  HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+
+jobs:
+  run-plan:
+    name: "Run Plan"
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          auth-type: IDENTITY
+
+      - name: Terraform fmt
+        uses: dflook/terraform-fmt-check@v1
+        with:
+          path: "terraform"
+
+      - name: Terraform validate
+        uses: dflook/terraform-validate@v1
+        with:
+          path: "terraform"
+
+      - name: Terraform plan
+        uses: dflook/terraform-plan@v1
+        with:
+          path: "terraform"
+          backend_config: |
+            resource_group_name=rg-group-015
+            storage_account_name=bucketterraform
+            container_name=tfstate
+            key=terraform.tfstate
+
+  check-ci:
+    name: "Check CI"
+    needs: run-plan
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check terraform plans statuses
+        run: |
+          echo "Terraform Run Plan Results : ${{ toJSON(needs) }}"
+
+          if [ "${{ needs.run-plan.result }}" == "skipped" ]; then
+            exit 0
+          fi
+
+          if [ "${{ needs.run-plan.result }}" == "success" ]; then
+            exit 0
+          fi
+
+          exit 1

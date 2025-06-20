@@ -102,7 +102,7 @@ resource "azurerm_virtual_machine" "vm_kub" {
   ]
   primary_network_interface_id = azurerm_network_interface.nic_vm_kub[each.key].id
 
-  delete_os_disk_on_termination = true
+  delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = false
 
   boot_diagnostics {
