@@ -1,4 +1,3 @@
-# Hérite des valeurs du chart kube-prometheus-stack
 kube-prometheus-stack:
   prometheus:
     ingress:

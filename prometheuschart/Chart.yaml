@@ -2,7 +2,7 @@ apiVersion: v2
 name: prometheuschart
 description: A Helm chart for Prometheus monitoring
 type: application
-version: 0.2.0  # Incrémenter la version
+version: 0.2.0 
 appVersion: "2.45.0"
 dependencies:
   - name: kube-prometheus-stack
