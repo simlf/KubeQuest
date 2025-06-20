@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-prometheus-stack-grafana
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      volumes:
+        - name: loki-datasource
+          configMap:
+            name: loki-datasource
+      containers:
+        - name: grafana
+          volumeMounts:
+            - name: loki-datasource
+              mountPath: /etc/grafana/provisioning/datasources/datasources.yaml
+              subPath: datasources.yaml

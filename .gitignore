@@ -42,3 +42,11 @@ ansible/inventory.yml
 database-secret.yml
 mysql-secret.yml
 mysql-cronjob-secret.yml
+
+# Helm
+**/charts/
+**/Chart.lock
+**/charts/*.tgz
+
+# Ignore all .lock files
+*.lock

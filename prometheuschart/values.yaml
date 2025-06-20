@@ -1,0 +1,23 @@
+prometheus:
+  server:
+    enabled: true
+    ingress:
+      enabled: true
+      hosts:
+        - prometheus-kubequest.duckdns.org
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    persistentVolume:
+      enabled: true
+      existingClaim: prometheus-pvc
+    serviceAccount:
+      create: true
+
+  alertmanager:
+    enabled: false
+
+  pushgateway:
+    enabled: false
+
+  nodeExporter:
+    enabled: false
