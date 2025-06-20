@@ -13,6 +13,3 @@ metadata:
       {"apiVersion":"v1","data":{"config":"address-pools:\n- name: default\n  protocol: layer2\n  addresses:\n  - 10.0.1.240-10.0.1.250\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"config","namespace":"metallb-system"}}
   creationTimestamp: "2025-06-19T22:29:23Z"
   name: config
-  namespace: metallb-system
-  resourceVersion: "1015398"
-  uid: 58fd51b1-67e7-48e0-a792-132b2edb7948
