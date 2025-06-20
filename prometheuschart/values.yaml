@@ -7,6 +7,11 @@ prometheus:
         - prometheus-kubequest.duckdns.org
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    persistentVolume:
+      enabled: true
+      existingClaim: prometheus-pvc
+    serviceAccount:
+      create: true
 
   alertmanager:
     enabled: false
@@ -16,7 +21,3 @@ prometheus:
 
   nodeExporter:
     enabled: false
-
-  serviceAccounts:
-    server:
-      create: true
