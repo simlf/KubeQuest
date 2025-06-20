@@ -1,6 +1,6 @@
 grafana:
   admin:
-    existingSecret: secret-grafana
+    existingSecret: prometheus-grafana
   persistence:
     enabled: true
     existingClaim: grafana-data-claim
